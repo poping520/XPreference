@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="Preference">
+        <attr name="android:icon" />
+        <attr name="android:key" />
+        <attr name="android:title" />
+        <attr name="android:summary" />
+    </declare-styleable>
+</resources>
