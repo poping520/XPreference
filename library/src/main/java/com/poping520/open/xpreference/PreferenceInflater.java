@@ -90,12 +90,9 @@ class PreferenceInflater {
 
     @NonNull
     private PreferenceGroup onMergeRoots(PreferenceGroup givenRoot, @NonNull PreferenceGroup xmlRoot) {
-        if (givenRoot == null) {
-            xmlRoot.onAttachedToHierarchy(mPreferenceManager);
-            return xmlRoot;
-        } else {
-            return givenRoot;
-        }
+        if (givenRoot != null) return givenRoot;
+        xmlRoot.onAttachedToHierarchy(mPreferenceManager);
+        return xmlRoot;
     }
 
     private void inflateAll(XmlPullParser parser, Preference parent, final AttributeSet attrs) throws XmlPullParserException, IOException {

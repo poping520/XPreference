@@ -11,7 +11,7 @@ import java.util.Set;
  * @version 1.0.0
  */
 
-public interface DataManager {
+public interface Storage {
 
 
     boolean saveInt(String key, int value);

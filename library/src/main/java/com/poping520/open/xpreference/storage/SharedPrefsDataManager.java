@@ -11,7 +11,7 @@ import java.util.Set;
  * @author poping520
  * @version 1.0.0
  */
-public class SharedPrefsDataManager implements DataManager {
+public class SharedPrefsDataManager implements Storage {
 
     private SharedPreferences mSharedPrefs;
     private SharedPreferences.Editor mEditor;
