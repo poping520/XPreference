@@ -2,10 +2,15 @@ package com.poping520.open.xpreference;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.XmlRes;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,8 +20,21 @@ public abstract class PreferenceFragment extends Fragment {
 
     private Context mContext;
     private PreferenceManager mPreferenceManager;
+    private RecyclerView mRecyclerView;
     private boolean mHavePrefs;
     private boolean mInitDone;
+
+    private Handler mHandler = new Handler(Looper.myLooper()) {
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            if (msg.what == 1) bindPreferences();
+        }
+    };
+
+    private Runnable mRequestFocus = () -> {
+        mRecyclerView.focusableViewAvailable(mRecyclerView);
+    };
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -36,9 +54,17 @@ public abstract class PreferenceFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
+        View view = inflater.inflate(R.layout.xpreference_list_fragment, container, false);
 
+        ViewGroup viewGroup = view.findViewById(R.id.list_container);
 
-        return super.onCreateView(inflater, container, savedInstanceState);
+        mRecyclerView = (RecyclerView) inflater.inflate(R.layout.xpreference_recyclerview, viewGroup, false);
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(mContext));
+        mRecyclerView.setAccessibilityDelegateCompat(new PreferenceRecyclerViewAccessibilityDelegate(mRecyclerView));
+
+        viewGroup.addView(mRecyclerView);
+        mHandler.post(mRequestFocus);
+        return view;
     }
 
     public PreferenceScreen getPreferenceScreen() {
@@ -71,4 +97,11 @@ public abstract class PreferenceFragment extends Fragment {
     }
 
 
+    private void bindPreferences() {
+        PreferenceScreen preferenceScreen = getPreferenceScreen();
+        if (preferenceScreen != null) {
+            mRecyclerView.setAdapter(new PreferenceGroupAdapter(preferenceScreen));
+            preferenceScreen.onAttached();
+        }
+    }
 }

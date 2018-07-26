@@ -47,6 +47,8 @@ public class Preference implements Comparable<Preference> {
 
 
     private OnPreferenceChangeInternalListener mListener;
+    private int mWidgetLayoutResource;
+
 
 
 
@@ -76,6 +78,10 @@ public class Preference implements Comparable<Preference> {
          * @param preference This Preference.
          */
         void onPreferenceVisibilityChange(Preference preference);
+    }
+
+    void setOnPreferenceChangeInternalListener(PreferenceGroupAdapter listener) {
+        mListener = listener;
     }
 
     public Preference(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
@@ -248,5 +254,13 @@ public class Preference implements Comparable<Preference> {
 
     public int getOrder() {
         return mOrder;
+    }
+
+    public int getLayoutResource() {
+        return layoutResId;
+    }
+
+    public int getWidgetLayoutResource() {
+        return 0;
     }
 }

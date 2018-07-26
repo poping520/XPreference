@@ -40,7 +40,6 @@ public class PreferenceManager {
     public boolean setPreferenceScreen(PreferenceScreen preferenceScreen) {
         if (preferenceScreen != mPreferenceScreen) {
             if (mPreferenceScreen != null) mPreferenceScreen.onDetached();
-
             mPreferenceScreen = preferenceScreen;
             return true;
         }

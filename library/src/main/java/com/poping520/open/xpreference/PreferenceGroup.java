@@ -86,4 +86,18 @@ public class PreferenceGroup extends Preference {
     public void setOrderingAsAdded(boolean orderingAsAdded) {
         mOrderingAsAdded = orderingAsAdded;
     }
+
+    void sortPreferences() {
+        synchronized (this) {
+            Collections.sort(mList);
+        }
+    }
+
+    public int getPreferenceCount() {
+        return mList.size();
+    }
+
+    List<Preference> getPreferenceList() {
+        return mList;
+    }
 }
