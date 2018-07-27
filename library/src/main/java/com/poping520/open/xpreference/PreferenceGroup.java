@@ -79,8 +79,22 @@ public class PreferenceGroup extends Preference {
         return true;
     }
 
+    @Override
+    public void onAttached() {
+        super.onAttached();
+        mAttachedToHierarchy = true;
+
+        for (Preference p : mList) {
+            p.onAttached();
+        }
+    }
+
     protected void prepareAddPreference(Preference preference) {
 
+    }
+
+    protected boolean isOnSameScreenAsChildren() {
+        return true;
     }
 
     public void setOrderingAsAdded(boolean orderingAsAdded) {

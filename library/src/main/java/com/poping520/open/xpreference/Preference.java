@@ -4,12 +4,17 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.res.TypedArray;
 import android.os.Bundle;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.AbsSavedState;
+import android.view.View;
 
+import com.poping520.open.xpreference.PreferenceGroupAdapter.PreferenceViewHolder;
 import com.poping520.open.xpreference.storage.Storage;
 
 
@@ -25,6 +30,11 @@ public class Preference implements Comparable<Preference> {
 
     private Storage mStorage;
 
+    private boolean mVisible = true;
+
+    private boolean mWasDetached;
+    private boolean mBaseMethodCalled;
+
 
     private long mId;
     private boolean mHasId;
@@ -37,6 +47,8 @@ public class Preference implements Comparable<Preference> {
     protected int layoutResId;
     protected boolean persistent;
 
+    private String mDependencyKey;
+
     private Object defaultValue;
     private int mOrder;
 
@@ -48,8 +60,6 @@ public class Preference implements Comparable<Preference> {
 
     private OnPreferenceChangeInternalListener mListener;
     private int mWidgetLayoutResource;
-
-
 
 
     public interface OnPreferenceClickListener {
@@ -96,6 +106,7 @@ public class Preference implements Comparable<Preference> {
         layoutResId = a.getResourceId(R.styleable.Preference_android_layout, R.layout.xpreference_material);
         persistent = a.getBoolean(R.styleable.Preference_android_persistent, true);
         mOrder = a.getInt(R.styleable.Preference_android_order, DEFAULT_ORDER);
+        mDependencyKey = a.getString(R.styleable.Preference_android_dependency);
 
         if (a.hasValue(R.styleable.Preference_android_defaultValue)) {
             defaultValue = onGetDefaultValue(a, R.styleable.Preference_android_defaultValue);
@@ -134,7 +145,18 @@ public class Preference implements Comparable<Preference> {
     }
 
     public void onAttached() {
+        registerDependency();
+    }
 
+    private void registerDependency() {
+        if (TextUtils.isEmpty(mDependencyKey)) return;
+
+    }
+
+    public void onBindViewHolder(PreferenceViewHolder holder) {
+        holder.itemView.setOnClickListener(v -> {
+            performClick(v);
+        });
     }
 
 
@@ -196,6 +218,30 @@ public class Preference implements Comparable<Preference> {
 
     }
 
+    void clearWasDetached() {
+        mWasDetached = true;
+    }
+
+    public void restoreHierarchyState(Bundle bundle) {
+        dispatchRestoreInstanceState(bundle);
+    }
+
+    void dispatchRestoreInstanceState(Bundle bundle) {
+        if (!hasKey()) return;
+        Parcelable state = bundle.getParcelable(key);
+        if (state != null) {
+            mBaseMethodCalled = false;
+            onRestoreInstanceState(state);
+        }
+    }
+
+    protected void onRestoreInstanceState(Parcelable state) {
+        mBaseMethodCalled = true;
+        if (state != BaseSavedState.EMPTY_STATE && state != null) {
+            throw new IllegalArgumentException("Wrong state class -- expecting Preference State");
+        }
+    }
+
     @Override
     public String toString() {
         return "Preference{" +
@@ -205,13 +251,12 @@ public class Preference implements Comparable<Preference> {
                 '}';
     }
 
-    /**
-     * Compares Preference objects based on order (if set), otherwise alphabetically on the titles.
-     *
-     * @param another The Preference to compare to this one.
-     * @return 0 if the same; less than 0 if this Preference sorts ahead of <var>another</var>;
-     * greater than 0 if this Preference sorts after <var>another</var>.
-     */
+    protected void performClick(View view) {
+
+
+    }
+
+
     @Override
     public int compareTo(@NonNull Preference another) {
         if (mOrder != another.mOrder) {
@@ -262,5 +307,39 @@ public class Preference implements Comparable<Preference> {
 
     public int getWidgetLayoutResource() {
         return 0;
+    }
+
+    public boolean isVisible() {
+        return mVisible;
+    }
+
+    public PreferenceManager getPreferenceManager() {
+        return preferenceManager;
+    }
+
+    public long getId() {
+        return mId;
+    }
+
+    public static class BaseSavedState extends AbsSavedState {
+        public BaseSavedState(Parcel source) {
+            super(source);
+        }
+
+        public BaseSavedState(Parcelable superState) {
+            super(superState);
+        }
+
+        public static final Creator<BaseSavedState> CREATOR = new Creator<BaseSavedState>() {
+            @Override
+            public BaseSavedState createFromParcel(Parcel in) {
+                return new BaseSavedState(in);
+            }
+
+            @Override
+            public BaseSavedState[] newArray(int size) {
+                return new BaseSavedState[size];
+            }
+        };
     }
 }

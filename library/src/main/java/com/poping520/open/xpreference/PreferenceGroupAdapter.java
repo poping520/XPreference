@@ -2,6 +2,7 @@ package com.poping520.open.xpreference;
 
 
 import android.support.annotation.NonNull;
+import android.support.v7.util.DiffUtil;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.view.View;
@@ -26,6 +27,8 @@ class PreferenceGroupAdapter extends RecyclerView.Adapter<PreferenceGroupAdapter
 
     private List<PreferenceLayout> mLayoutList;
 
+    private PreferenceLayout mTempLayout = new PreferenceLayout();
+
 
     PreferenceGroupAdapter(PreferenceGroup preferenceGroup) {
         mPreferenceGroup = preferenceGroup;
@@ -49,17 +52,84 @@ class PreferenceGroupAdapter extends RecyclerView.Adapter<PreferenceGroupAdapter
             p.setOnPreferenceChangeInternalListener(null);
         }
 
-        List<Preference> fullPreferenceList = new ArrayList<>(mListInternal.size());
-        flattenPreferenceGroup(fullPreferenceList, mPreferenceGroup);
+        List<Preference> fullList = new ArrayList<>(mListInternal.size());
+        flattenPreferenceGroup(fullList, mPreferenceGroup);
+
+        List<Preference> newVisibleList = new ArrayList<>(fullList.size());
+
+        for (Preference p : fullList) {
+            if (p.isVisible()) {
+                newVisibleList.add(p);
+            }
+        }
+
+        List<Preference> oldVisibleList = mList;
+        mList = newVisibleList;
+        mListInternal = fullList;
+
+        PreferenceManager mgr = mPreferenceGroup.getPreferenceManager();
+        if (mgr != null && mgr.getPreferenceComparisonCallback() != null) {
+            PreferenceManager.PreferenceComparisonCallback callback = mgr.getPreferenceComparisonCallback();
+
+            DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new DiffUtil.Callback() {
+                @Override
+                public int getOldListSize() {
+                    return oldVisibleList.size();
+                }
+
+                @Override
+                public int getNewListSize() {
+                    return newVisibleList.size();
+                }
+
+                @Override
+                public boolean areItemsTheSame(int oldItemPosition, int newItemPosition) {
+                    return callback.arePreferenceItemsTheSame(oldVisibleList.get(oldItemPosition),
+                            newVisibleList.get(newItemPosition));
+                }
+
+                @Override
+                public boolean areContentsTheSame(int oldItemPosition, int newItemPosition) {
+                    return callback.arePreferenceContentsTheSame(oldVisibleList.get(oldItemPosition),
+                            newVisibleList.get(newItemPosition));
+                }
+            });
+
+            diffResult.dispatchUpdatesTo(this);
+        } else
+            notifyDataSetChanged();
+
+        for (Preference p : fullList) {
+            p.clearWasDetached();
+        }
+
+
     }
 
-    private void flattenPreferenceGroup(List<Preference> preferences, PreferenceGroup preferenceGroup) {
-        preferenceGroup.sortPreferences();
-        List<Preference> groupPreferenceList = preferenceGroup.getPreferenceList();
+    private void flattenPreferenceGroup(List<Preference> preferences, PreferenceGroup group) {
+        group.sortPreferences();
+
+        List<Preference> groupPreferenceList = group.getPreferenceList();
+        //TODO
+        preferences.addAll(groupPreferenceList);
+
         for (Preference p : groupPreferenceList) {
-            preferences.add(p);
+            addPreferenceClassName(p);
 
+            if (p instanceof PreferenceGroup) {
+                PreferenceGroup asGroup = (PreferenceGroup) p;
+                if (asGroup.isOnSameScreenAsChildren()) {
+                    flattenPreferenceGroup(preferences, asGroup);
+                }
+            }
+            p.setOnPreferenceChangeInternalListener(this);
+        }
+    }
 
+    private void addPreferenceClassName(Preference preference) {
+        PreferenceLayout pl = createPreferenceLayout(preference, null);
+        if (!mLayoutList.contains(pl)) {
+            mLayoutList.add(pl);
         }
     }
 
@@ -73,6 +143,11 @@ class PreferenceGroupAdapter extends RecyclerView.Adapter<PreferenceGroupAdapter
         pl.resId = preference.getLayoutResource();
         pl.widgetResId = preference.getWidgetLayoutResource();
         return pl;
+    }
+
+    public Preference getItem(int position) {
+        if (position < 0 || position >= getItemCount()) return null;
+        return mList.get(position);
     }
 
     @Override
@@ -98,14 +173,35 @@ class PreferenceGroupAdapter extends RecyclerView.Adapter<PreferenceGroupAdapter
 
     @Override
     public void onBindViewHolder(@NonNull PreferenceViewHolder holder, int position) {
-
+        getItem(position).onBindViewHolder(holder);
     }
 
     @Override
     public int getItemCount() {
-        return 0;
+        return mList.size();
     }
 
+    @Override
+    public long getItemId(int position) {
+        if (!hasStableIds())
+            return RecyclerView.NO_ID;
+        return this.getItem(position).getId();
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        Preference item = getItem(position);
+        mTempLayout = createPreferenceLayout(item, mTempLayout);
+
+        int index = mLayoutList.indexOf(mTempLayout);
+
+        if (index != -1) return index;
+        else {
+            index = mList.size();
+            mLayoutList.add(new PreferenceLayout(mTempLayout));
+            return index;
+        }
+    }
 
     private static class PreferenceLayout {
         private int resId;

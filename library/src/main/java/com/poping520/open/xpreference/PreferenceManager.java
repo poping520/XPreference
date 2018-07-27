@@ -19,6 +19,36 @@ public class PreferenceManager {
 
     private PreferenceScreen mPreferenceScreen;
 
+    private PreferenceComparisonCallback mPreferenceComparisonCallback;
+    private OnPreferenceTreeClickListener mOnPreferenceTreeClickListener;
+    private OnDisplayPreferenceDialogListener mOnDisplayPreferenceDialogListener;
+
+    public void setOnPreferenceTreeClickListener(OnPreferenceTreeClickListener listener) {
+        mOnPreferenceTreeClickListener = listener;
+    }
+
+    public void setOnDisplayPreferenceDialogListener(OnDisplayPreferenceDialogListener listener) {
+        mOnDisplayPreferenceDialogListener = listener;
+    }
+
+    public static abstract class PreferenceComparisonCallback {
+
+        public abstract boolean arePreferenceItemsTheSame(Preference p1, Preference p2);
+
+        public abstract boolean arePreferenceContentsTheSame(Preference p1, Preference p2);
+    }
+
+    public interface OnPreferenceTreeClickListener {
+
+        boolean onPreferenceTreeClick(Preference preference);
+    }
+
+    public interface OnDisplayPreferenceDialogListener {
+
+        void onDisplayPreferenceDialog(Preference preference);
+    }
+
+
     PreferenceManager(Context context) {
         mContext = context;
     }
@@ -54,5 +84,9 @@ public class PreferenceManager {
         synchronized (this) {
             return ++mNextId;
         }
+    }
+
+    public PreferenceComparisonCallback getPreferenceComparisonCallback() {
+        return mPreferenceComparisonCallback;
     }
 }

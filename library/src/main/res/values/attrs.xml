@@ -9,6 +9,7 @@
         <attr name="android:persistent" />
         <attr name="android:defaultValue" />
         <attr name="android:order" />
+        <attr name="android:dependency" />
     </declare-styleable>
 
     <declare-styleable name="PreferenceGroup">

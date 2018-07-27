@@ -16,7 +16,11 @@ import android.view.View;
 import android.view.ViewGroup;
 
 
-public abstract class PreferenceFragment extends Fragment {
+public abstract class PreferenceFragment extends Fragment implements
+        PreferenceManager.OnPreferenceTreeClickListener,
+        PreferenceManager.OnDisplayPreferenceDialogListener {
+
+    private static final String PREFERENCES_TAG = "android:preferences";
 
     private Context mContext;
     private PreferenceManager mPreferenceManager;
@@ -67,6 +71,24 @@ public abstract class PreferenceFragment extends Fragment {
         return view;
     }
 
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        if (savedInstanceState != null) {
+            Bundle bundle = savedInstanceState.getBundle(PREFERENCES_TAG);
+            if (bundle != null && getPreferenceScreen() != null) {
+                getPreferenceScreen().restoreHierarchyState(bundle);
+            }
+        }
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        mPreferenceManager.setOnPreferenceTreeClickListener(this);
+        mPreferenceManager.setOnDisplayPreferenceDialogListener(this);
+    }
+
     public PreferenceScreen getPreferenceScreen() {
         return mPreferenceManager.getPreferenceScreen();
     }
@@ -103,5 +125,20 @@ public abstract class PreferenceFragment extends Fragment {
             mRecyclerView.setAdapter(new PreferenceGroupAdapter(preferenceScreen));
             preferenceScreen.onAttached();
         }
+        onBindPreferences();
+    }
+
+    protected void onBindPreferences() {
+
+    }
+
+    @Override
+    public boolean onPreferenceTreeClick(Preference preference) {
+        return false;
+    }
+
+    @Override
+    public void onDisplayPreferenceDialog(Preference preference) {
+
     }
 }
