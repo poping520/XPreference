@@ -8,14 +8,19 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.StringRes;
+import android.support.v4.view.accessibility.AccessibilityNodeInfoCompat;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.AbsSavedState;
 import android.view.View;
+import android.widget.TextView;
 
 import com.poping520.open.xpreference.PreferenceGroupAdapter.PreferenceViewHolder;
 import com.poping520.open.xpreference.storage.Storage;
+
+import java.util.List;
 
 
 public class Preference implements Comparable<Preference> {
@@ -35,6 +40,7 @@ public class Preference implements Comparable<Preference> {
     private boolean mWasDetached;
     private boolean mBaseMethodCalled;
 
+    private int mViewId;
 
     private long mId;
     private boolean mHasId;
@@ -46,21 +52,80 @@ public class Preference implements Comparable<Preference> {
     protected String summary;
     protected int layoutResId;
     protected boolean persistent;
-
     private String mDependencyKey;
+    private String mFragment;
+    private boolean mEnable;
+
 
     private Object defaultValue;
     private int mOrder;
+
+
+    private boolean mHasSingleLineTitleAttr;
+    private boolean mSingleLineTitle = true;
 
     private PreferenceGroup mParentGroup;
 
     private Intent mIntent;
     private Bundle mExtras;
 
+    private List<Preference> mDependents;
+
 
     private OnPreferenceChangeInternalListener mListener;
     private int mWidgetLayoutResource;
 
+    public void onInitializeAccessibilityNodeInfo(AccessibilityNodeInfoCompat info) {
+
+    }
+
+    public void onPrepareForRemoval() {
+        unregisterDependency();
+    }
+
+    private void unregisterDependency() {
+        if (mDependencyKey != null) {
+            Preference old = findPreferenceInHierarchy(mDependencyKey);
+            if (old != null) old.unregisterDependent(this);
+        }
+    }
+
+    protected Preference findPreferenceInHierarchy(String key) {
+        if (TextUtils.isEmpty(key) || preferenceManager == null)
+            return null;
+        return preferenceManager.getPreferenceScreen().findPreference(key);
+    }
+
+    private void unregisterDependent(Preference dependent) {
+        if (mDependents != null) {
+            mDependents.remove(dependent);
+        }
+    }
+
+    public boolean shouldDisableDependents() {
+        return !isEnabled();
+    }
+
+    public boolean isEnabled() {
+        return mEnable;
+    }
+
+    public void onParentChanged(PreferenceGroup preferenceGroup, boolean b) {
+
+    }
+
+    public void notifyHierarchyChanged(boolean disableDependents) {
+
+    }
+
+    void dispatchSaveInstanceState(Bundle container) {
+
+    }
+
+    @Nullable
+    public PreferenceGroup getParent() {
+        return mParentGroup;
+    }
 
     public interface OnPreferenceClickListener {
 
@@ -106,14 +171,18 @@ public class Preference implements Comparable<Preference> {
         layoutResId = a.getResourceId(R.styleable.Preference_android_layout, R.layout.xpreference_material);
         persistent = a.getBoolean(R.styleable.Preference_android_persistent, true);
         mOrder = a.getInt(R.styleable.Preference_android_order, DEFAULT_ORDER);
+        mFragment = a.getString(R.styleable.Preference_android_fragment);
         mDependencyKey = a.getString(R.styleable.Preference_android_dependency);
 
         if (a.hasValue(R.styleable.Preference_android_defaultValue)) {
             defaultValue = onGetDefaultValue(a, R.styleable.Preference_android_defaultValue);
         }
 
+        mHasSingleLineTitleAttr = a.hasValue(R.styleable.Preference_singleLineTitle);
+        if (mHasSingleLineTitleAttr) {
+            mSingleLineTitle = a.getBoolean(R.styleable.Preference_singleLineTitle, true);
+        }
 
-        Log.e(TAG, "Preference: " + toString());
         a.recycle();
     }
 
@@ -139,6 +208,27 @@ public class Preference implements Comparable<Preference> {
         return null;
     }
 
+    public void onBindViewHolder(PreferenceViewHolder holder) {
+        holder.itemView.setOnClickListener(v -> performClick(v));
+        holder.itemView.setId(mViewId);
+
+        Log.e(TAG, "onBindViewHolder: ===" );
+
+        TextView tv = holder.findViewById(R.id.title);
+        if (tv != null) {
+            if (!TextUtils.isEmpty(title)) {
+                tv.setText(title);
+                tv.setVisibility(View.VISIBLE);
+
+                if (mHasSingleLineTitleAttr)
+                    tv.setSingleLine(mSingleLineTitle);
+
+            } else {
+                tv.setVisibility(View.GONE);
+            }
+        }
+    }
+
 
     void assignParent(@Nullable PreferenceGroup parentGroup) {
         mParentGroup = parentGroup;
@@ -152,13 +242,6 @@ public class Preference implements Comparable<Preference> {
         if (TextUtils.isEmpty(mDependencyKey)) return;
 
     }
-
-    public void onBindViewHolder(PreferenceViewHolder holder) {
-        holder.itemView.setOnClickListener(v -> {
-            performClick(v);
-        });
-    }
-
 
     public boolean hasKey() {
         return !TextUtils.isEmpty(key);
@@ -242,14 +325,6 @@ public class Preference implements Comparable<Preference> {
         }
     }
 
-    @Override
-    public String toString() {
-        return "Preference{" +
-                "key='" + key + '\'' +
-                ", title='" + title + '\'' +
-                ", summary='" + summary + '\'' +
-                '}';
-    }
 
     protected void performClick(View view) {
 
@@ -279,10 +354,46 @@ public class Preference implements Comparable<Preference> {
         mIntent = intent;
     }
 
+    public Intent getIntent() {
+        return mIntent;
+    }
+
+    public void setFragment(String fragment) {
+        mFragment = fragment;
+    }
+
+    public String getFragment() {
+        return mFragment;
+    }
+
     public Bundle getExtras() {
+        if (mExtras == null)
+            mExtras = new Bundle();
         return mExtras;
     }
 
+    public Bundle peekExtras() {
+        return mExtras;
+    }
+
+    public void setLayoutResId(int layoutResId) {
+        this.layoutResId = layoutResId;
+    }
+
+    public int getLayoutResource() {
+        return layoutResId;
+    }
+
+    public void setWidgetLayoutResource(int widgetLayoutResource) {
+        mWidgetLayoutResource = widgetLayoutResource;
+    }
+
+    public int getWidgetLayoutResource() {
+        return mWidgetLayoutResource;
+    }
+
+
+    //
 
     public String getKey() {
         return key;
@@ -301,12 +412,27 @@ public class Preference implements Comparable<Preference> {
         return mOrder;
     }
 
-    public int getLayoutResource() {
-        return layoutResId;
+    public void setViewId(int viewId) {
+        mViewId = viewId;
     }
 
-    public int getWidgetLayoutResource() {
-        return 0;
+    public void setTitle(CharSequence title) {
+        if ((title == null && this.title != null) || (title != null && !title.equals(this.title))) {
+            this.title = title;
+            notifyChanged();
+        }
+    }
+
+    public void setTitle(@StringRes int resId) {
+        setTitle(mContext.getString(resId));
+    }
+
+    public CharSequence getTitle() {
+        return title;
+    }
+
+    private void notifyChanged() {
+
     }
 
     public boolean isVisible() {

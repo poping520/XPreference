@@ -22,14 +22,8 @@ public class PreferenceManager {
     private PreferenceComparisonCallback mPreferenceComparisonCallback;
     private OnPreferenceTreeClickListener mOnPreferenceTreeClickListener;
     private OnDisplayPreferenceDialogListener mOnDisplayPreferenceDialogListener;
+    private OnNavigateToScreenListener mOnNavigateToScreenListener;
 
-    public void setOnPreferenceTreeClickListener(OnPreferenceTreeClickListener listener) {
-        mOnPreferenceTreeClickListener = listener;
-    }
-
-    public void setOnDisplayPreferenceDialogListener(OnDisplayPreferenceDialogListener listener) {
-        mOnDisplayPreferenceDialogListener = listener;
-    }
 
     public static abstract class PreferenceComparisonCallback {
 
@@ -46,6 +40,11 @@ public class PreferenceManager {
     public interface OnDisplayPreferenceDialogListener {
 
         void onDisplayPreferenceDialog(Preference preference);
+    }
+
+    public interface OnNavigateToScreenListener {
+
+        void onNavigateToScreen(PreferenceScreen preferenceScreen);
     }
 
 
@@ -88,5 +87,17 @@ public class PreferenceManager {
 
     public PreferenceComparisonCallback getPreferenceComparisonCallback() {
         return mPreferenceComparisonCallback;
+    }
+
+    public void setOnPreferenceTreeClickListener(OnPreferenceTreeClickListener listener) {
+        mOnPreferenceTreeClickListener = listener;
+    }
+
+    public void setOnDisplayPreferenceDialogListener(OnDisplayPreferenceDialogListener listener) {
+        mOnDisplayPreferenceDialogListener = listener;
+    }
+
+    public OnNavigateToScreenListener getOnNavigateToScreenListener() {
+        return mOnNavigateToScreenListener;
     }
 }

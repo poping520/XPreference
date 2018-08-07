@@ -25,10 +25,9 @@ public class MainActivity extends AppCompatActivity {
     public static class SampleFragment extends PreferenceFragment {
 
         @Override
-        public void onCreate(@Nullable Bundle savedInstanceState) {
-            super.onCreate(savedInstanceState);
-
+        protected void onCreatePreferences(@Nullable Bundle savedInstanceState) {
             addPreferencesFromResource(R.xml.xpref_sample);
+
         }
     }
 }

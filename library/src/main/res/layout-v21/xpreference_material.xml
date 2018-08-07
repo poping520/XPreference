@@ -24,7 +24,7 @@
         android:paddingTop="4dp">
 
         <com.poping520.open.xpreference.internal.PreferenceImageView
-            android:id="@android:id/icon"
+            android:id="@+id/icon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:maxHeight="48dp"
@@ -39,7 +39,7 @@
         android:paddingTop="16dp">
 
         <TextView
-            android:id="@android:id/title"
+            android:id="@+id/title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:ellipsize="marquee"
@@ -47,11 +47,11 @@
             android:textAppearance="?android:attr/textAppearanceListItem" />
 
         <TextView
-            android:id="@android:id/summary"
+            android:id="@+id/summary"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignStart="@android:id/title"
-            android:layout_below="@android:id/title"
+            android:layout_alignStart="@id/title"
+            android:layout_below="@id/title"
             android:maxLines="10"
             android:textAppearance="?android:attr/textAppearanceListItemSecondary"
             android:textColor="?android:attr/textColorSecondary" />
@@ -60,7 +60,7 @@
 
     <!-- Preference should place its actual preference widget here. -->
     <LinearLayout
-        android:id="@android:id/widget_frame"
+        android:id="@+id/widget_frame"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:gravity="end|center_vertical"

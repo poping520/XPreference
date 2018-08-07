@@ -11,6 +11,7 @@ import android.support.annotation.XmlRes;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,11 +29,13 @@ public abstract class PreferenceFragment extends Fragment implements
     private boolean mHavePrefs;
     private boolean mInitDone;
 
+    private static final int MSG_BIND_PREFERENCES = 1;
+
     private Handler mHandler = new Handler(Looper.myLooper()) {
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
-            if (msg.what == 1) bindPreferences();
+            if (msg.what == MSG_BIND_PREFERENCES) bindPreferences();
         }
     };
 
@@ -72,6 +75,13 @@ public abstract class PreferenceFragment extends Fragment implements
     }
 
     @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        mInitDone = true;
+    }
+
+    @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         if (savedInstanceState != null) {
@@ -107,8 +117,13 @@ public abstract class PreferenceFragment extends Fragment implements
         }
     }
 
-    protected void postBindPreferences() {
+    public Preference findPreference(CharSequence key) {
+        return getPreferenceScreen().findPreference(key);
+    }
 
+    protected void postBindPreferences() {
+        if (mHandler.hasMessages(MSG_BIND_PREFERENCES)) return;
+        mHandler.obtainMessage(MSG_BIND_PREFERENCES).sendToTarget();
     }
 
     public PreferenceScreen inflateFromResource(@XmlRes int resId, PreferenceScreen rootPreferences) {
@@ -117,7 +132,6 @@ public abstract class PreferenceFragment extends Fragment implements
         rootPreferences.onAttachedToHierarchy(mPreferenceManager);
         return rootPreferences;
     }
-
 
     private void bindPreferences() {
         PreferenceScreen preferenceScreen = getPreferenceScreen();

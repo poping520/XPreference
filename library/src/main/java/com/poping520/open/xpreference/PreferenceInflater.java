@@ -6,7 +6,6 @@ import android.content.res.XmlResourceParser;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.util.Xml;
 import android.view.InflateException;
 
@@ -19,8 +18,6 @@ import java.util.HashMap;
 
 
 class PreferenceInflater {
-
-    private static final String TAG = "PreferenceInflater";
 
     private static final HashMap<String, Constructor> CONSTRUCTOR_MAP = new HashMap<>();
 
@@ -74,7 +71,7 @@ class PreferenceInflater {
             if (constructor == null) {
                 Class<?> clazz = mContext.getClassLoader().loadClass(
                         name.indexOf('.') == -1 ? X_PREFERENCE_PACKAGE + name : name);
-                constructor = clazz.getConstructor(Context.class, AttributeSet.class);
+                constructor = clazz.getDeclaredConstructor(Context.class, AttributeSet.class);
                 constructor.setAccessible(true);
                 CONSTRUCTOR_MAP.put(name, constructor);
             }

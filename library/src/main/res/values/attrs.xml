@@ -1,5 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
+    <declare-styleable name="PreferenceTheme">
+        <attr name="preferenceTheme" format="reference" />
+        <attr name="preferenceScreenStyle" format="reference" />
+    </declare-styleable>
+
     <declare-styleable name="Preference">
         <attr name="android:icon" />
         <attr name="android:key" />
@@ -9,7 +15,9 @@
         <attr name="android:persistent" />
         <attr name="android:defaultValue" />
         <attr name="android:order" />
+        <attr name="android:fragment" />
         <attr name="android:dependency" />
+        <attr name="singleLineTitle" format="boolean" />
     </declare-styleable>
 
     <declare-styleable name="PreferenceGroup">
@@ -19,6 +27,10 @@
     <declare-styleable name="PreferenceImageView">
         <attr name="maxWidth" format="dimension|reference" />
         <attr name="maxHeight" format="dimension|reference" />
+    </declare-styleable>
+
+    <declare-styleable name="BackgroundStyle">
+        <attr name="android:selectableItemBackground" />
     </declare-styleable>
 
 
