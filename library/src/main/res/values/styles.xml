@@ -1,8 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
 
     <style name="Preference">
         <item name="android:layout">@layout/xpreference_material</item>
+    </style>
+
+    <style name="Preference.Category">
+        <item name="android:layout">@layout/xpreference_category_material</item>
+        <item name="android:shouldDisableView">false</item>
+        <item name="android:selectable">false</item>
     </style>
 
     <style name="Preference.CheckBoxPreference">
@@ -15,4 +21,10 @@
         <item name="android:switchTextOff">OFF</item>
     </style>
 
+    <style name="Preference_TextAppearanceMaterialBody2">
+        <item name="android:textSize">14sp</item>
+        <item tools:ignore="NewApi" name="android:fontFamily">sans-serif</item>
+        <item name="android:textColor">?android:attr/textColorPrimary</item>
+        <item name="android:textStyle">normal</item>
+    </style>
 </resources>

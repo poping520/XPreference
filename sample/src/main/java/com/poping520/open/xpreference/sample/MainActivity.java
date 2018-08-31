@@ -1,6 +1,7 @@
 package com.poping520.open.xpreference.sample;
 
 import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.preference.Preference;
@@ -40,5 +41,6 @@ public class MainActivity extends AppCompatActivity {
         public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
             addPreferencesFromResource(R.xml.xpref_sample);
         }
+
     }
 }

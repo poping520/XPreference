@@ -52,6 +52,10 @@ public abstract class PreferenceFragment extends Fragment implements
 
     private Runnable mSelectPreferenceRunnable;
 
+    public interface OnPreferenceStartFragmentCallback {
+        boolean onPreferenceStartFragment(PreferenceFragment caller, Preference pref);
+    }
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -143,13 +147,20 @@ public abstract class PreferenceFragment extends Fragment implements
         }
     }
 
-    public Preference findPreference(CharSequence key) {
-        return getPreferenceScreen().findPreference(key);
+    @Override
+    public boolean onPreferenceTreeClick(Preference preference) {
+        if (preference.getFragment() != null) {
+            boolean handled = false;
+            if (getCallbackFragment() instanceof OnPreferenceStartFragmentCallback) {
+
+            }
+        }
+        return false;
     }
 
-    protected void postBindPreferences() {
-        if (mHandler.hasMessages(MSG_BIND_PREFERENCES)) return;
-        mHandler.obtainMessage(MSG_BIND_PREFERENCES).sendToTarget();
+
+    public Preference findPreference(CharSequence key) {
+        return getPreferenceScreen().findPreference(key);
     }
 
     public PreferenceScreen inflateFromResource(@XmlRes int resId, PreferenceScreen rootPreferences) {
@@ -157,6 +168,11 @@ public abstract class PreferenceFragment extends Fragment implements
         rootPreferences = (PreferenceScreen) inflater.inflate(resId, rootPreferences);
         rootPreferences.onAttachedToHierarchy(mPreferenceManager);
         return rootPreferences;
+    }
+
+    protected void postBindPreferences() {
+        if (mHandler.hasMessages(MSG_BIND_PREFERENCES)) return;
+        mHandler.obtainMessage(MSG_BIND_PREFERENCES).sendToTarget();
     }
 
     private void bindPreferences() {
@@ -168,18 +184,26 @@ public abstract class PreferenceFragment extends Fragment implements
         onBindPreferences();
     }
 
-    protected void onBindPreferences() {
-
+    private void unbindPreferences() {
+        PreferenceScreen preferenceScreen = getPreferenceScreen();
+        if (preferenceScreen != null)
+            preferenceScreen.onDetached();
+        onUnbindPreferences();
     }
 
-    @Override
-    public boolean onPreferenceTreeClick(Preference preference) {
-        return false;
+    protected void onBindPreferences() {
+    }
+
+    protected void onUnbindPreferences() {
     }
 
     @Override
     public void onDisplayPreferenceDialog(Preference preference) {
 
+    }
+
+    public Fragment getCallbackFragment() {
+        return null;
     }
 
     public void scrollToPreference(String key) {

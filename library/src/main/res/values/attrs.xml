@@ -4,6 +4,7 @@
     <declare-styleable name="PreferenceTheme">
         <attr name="preferenceTheme" format="reference" />
         <attr name="preferenceScreenStyle" format="reference" />
+        <attr name="preferenceCategoryStyle" format="reference" />
         <attr name="checkBoxPreferenceStyle" format="reference" />
         <attr name="switchPreferenceStyle" format="reference" />
     </declare-styleable>

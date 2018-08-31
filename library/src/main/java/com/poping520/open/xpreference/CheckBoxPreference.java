@@ -69,10 +69,10 @@ public class CheckBoxPreference extends TwoStatePreference {
 
         if (mgr == null || !mgr.isEnabled()) return;
 
-        View checkboxView = view.findViewById(android.R.id.checkbox);
+        View checkboxView = view.findViewById(R.id.checkbox_widget);
         syncCheckboxView(checkboxView);
 
-        View summaryView = view.findViewById(android.R.id.summary);
+        View summaryView = view.findViewById(R.id.summary);
         syncSummaryView(summaryView);
     }
 
