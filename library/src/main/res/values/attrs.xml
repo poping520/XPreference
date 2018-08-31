@@ -4,6 +4,8 @@
     <declare-styleable name="PreferenceTheme">
         <attr name="preferenceTheme" format="reference" />
         <attr name="preferenceScreenStyle" format="reference" />
+        <attr name="checkBoxPreferenceStyle" format="reference" />
+        <attr name="switchPreferenceStyle" format="reference" />
     </declare-styleable>
 
     <declare-styleable name="Preference">
@@ -16,8 +18,31 @@
         <attr name="android:defaultValue" />
         <attr name="android:order" />
         <attr name="android:fragment" />
+        <attr name="android:enabled" />
+        <attr name="android:selectable" />
         <attr name="android:dependency" />
+        <attr name="android:widgetLayout" />
+
+        <attr name="android:iconSpaceReserved" />
+        <attr name="android:shouldDisableView" />
+
         <attr name="singleLineTitle" format="boolean" />
+        <attr name="allowDividerAbove" format="boolean" />
+        <attr name="allowDividerBelow" format="boolean" />
+    </declare-styleable>
+
+    <declare-styleable name="CheckBoxPreference">
+        <attr name="android:summaryOn" />
+        <attr name="android:summaryOff" />
+        <attr name="android:disableDependentsState" />
+    </declare-styleable>
+
+    <declare-styleable name="SwitchPreference">
+        <attr name="android:summaryOn" />
+        <attr name="android:summaryOff" />
+        <attr name="android:switchTextOn"/>
+        <attr name="android:switchTextOff" />
+        <attr name="android:disableDependentsState" />
     </declare-styleable>
 
     <declare-styleable name="PreferenceGroup">
@@ -32,6 +57,5 @@
     <declare-styleable name="BackgroundStyle">
         <attr name="android:selectableItemBackground" />
     </declare-styleable>
-
 
 </resources>

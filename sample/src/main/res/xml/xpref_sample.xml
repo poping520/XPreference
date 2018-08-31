@@ -3,21 +3,14 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:key="key0">
 
-    <Preference
-        android:key="key1"
-        android:summary="summary1"
-        android:title="title1" />
-    <Preference
-        android:key="key2"
-        android:summary="summary2"
-        android:title="title2" />
-    <Preference
-        android:key="key3"
-        android:summary="summary3"
-        android:title="title3" />
-    <Preference
-        android:key="key4"
-        android:summary="summary4"
-        android:title="title4" />
+    <CheckBoxPreference
+        android:key="checkbox"
+        android:summary="This is CheckBox"
+        android:title="CheckBox" />
+
+    <!--<SwitchPreference-->
+        <!--android:key="switch"-->
+        <!--android:summary="This is Switch"-->
+        <!--android:title="Switch" />-->
 
 </PreferenceScreen>

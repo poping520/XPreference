@@ -41,9 +41,9 @@ public class PreferenceImageView extends AppCompatImageView {
         a.recycle();
     }
 
-//    public PreferenceImageView(Context context, AttributeSet attrs, int defStyleAttr,
+//    public PreferenceImageView(Context mContext, AttributeSet attrs, int defStyleAttr,
 //            int defStyleRes) {
-//        super(context, attrs, defStyleAttr, defStyleRes);
+//        super(mContext, attrs, defStyleAttr, defStyleRes);
 //    }
 
     @Override

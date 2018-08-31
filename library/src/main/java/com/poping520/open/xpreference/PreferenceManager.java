@@ -93,6 +93,10 @@ public class PreferenceManager {
         mOnPreferenceTreeClickListener = listener;
     }
 
+    public OnPreferenceTreeClickListener getOnPreferenceTreeClickListener() {
+        return mOnPreferenceTreeClickListener;
+    }
+
     public void setOnDisplayPreferenceDialogListener(OnDisplayPreferenceDialogListener listener) {
         mOnDisplayPreferenceDialogListener = listener;
     }

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="Preference">
+        <item name="android:layout">@layout/xpreference_material</item>
+    </style>
+
+    <style name="Preference.CheckBoxPreference">
+        <item name="android:widgetLayout">@layout/xpreference_widget_checkbox</item>
+    </style>
+
+    <style name="Preference.SwitchPreference">
+        <item name="android:widgetLayout">@layout/xpreference_widget_switch</item>
+        <item name="android:switchTextOn">ON</item>
+        <item name="android:switchTextOff">OFF</item>
+    </style>
+
+</resources>

@@ -3,6 +3,7 @@ package com.poping520.open.xpreference;
 import android.content.Context;
 import android.util.AttributeSet;
 
+//completed
 public class PreferenceScreen extends PreferenceGroup {
 
     private boolean mShouldUseGeneratedIds = true;

@@ -4,6 +4,7 @@ package com.poping520.open.xpreference;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.drawable.Drawable;
+import android.os.Handler;
 import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
@@ -20,8 +21,9 @@ import android.view.ViewGroup;
 import java.util.ArrayList;
 import java.util.List;
 
+//completed
 class PreferenceGroupAdapter extends RecyclerView.Adapter<PreferenceGroupAdapter.PreferenceViewHolder>
-        implements Preference.OnPreferenceChangeInternalListener {
+        implements Preference.OnPreferenceChangeInternalListener, PreferenceGroup.PreferencePositionCallback {
 
     private PreferenceGroup mPreferenceGroup;
 
@@ -33,7 +35,9 @@ class PreferenceGroupAdapter extends RecyclerView.Adapter<PreferenceGroupAdapter
 
     private PreferenceLayout mTempLayout = new PreferenceLayout();
 
-    private static final String TAG = "PreferenceGroupAdapter";
+    private Handler mHandler = new Handler();
+
+    private Runnable mSyncRunnable = this::syncPreferences;
 
     PreferenceGroupAdapter(PreferenceGroup preferenceGroup) {
         mPreferenceGroup = preferenceGroup;
@@ -50,7 +54,6 @@ class PreferenceGroupAdapter extends RecyclerView.Adapter<PreferenceGroupAdapter
 
         syncPreferences();
 
-        Log.e(TAG, "PreferenceGroupAdapter: ===" );
     }
 
     private void syncPreferences() {
@@ -130,17 +133,6 @@ class PreferenceGroupAdapter extends RecyclerView.Adapter<PreferenceGroupAdapter
         }
     }
 
-    private void addPreferenceClassName(Preference preference) {
-        PreferenceLayout pl = createPreferenceLayout(preference, null);
-        if (!mPreferenceLayouts.contains(pl)) {
-            mPreferenceLayouts.add(pl);
-        }
-    }
-
-    private void getPreferenceCount(Preference preference) {
-
-    }
-
     private PreferenceLayout createPreferenceLayout(Preference preference, PreferenceLayout in) {
         PreferenceLayout pl = in != null ? in : new PreferenceLayout();
         pl.name = preference.getClass().getName();
@@ -149,24 +141,78 @@ class PreferenceGroupAdapter extends RecyclerView.Adapter<PreferenceGroupAdapter
         return pl;
     }
 
+    private void addPreferenceClassName(Preference preference) {
+        PreferenceLayout pl = createPreferenceLayout(preference, null);
+        if (!mPreferenceLayouts.contains(pl)) {
+            mPreferenceLayouts.add(pl);
+        }
+    }
+
+    @Override
+    public int getItemCount() {
+        return mPreferences.size();
+    }
+
     public Preference getItem(int position) {
         if (position < 0 || position >= getItemCount()) return null;
         return mPreferences.get(position);
     }
 
     @Override
-    public void onPreferenceChange(Preference preference) {
+    public long getItemId(int position) {
+        if (!hasStableIds())
+            return RecyclerView.NO_ID;
+        return this.getItem(position).getId();
+    }
 
+    @Override
+    public void onPreferenceChange(Preference preference) {
+        int index = mPreferences.indexOf(preference);
+        if (index != -1) notifyItemChanged(index, preference);
     }
 
     @Override
     public void onPreferenceHierarchyChange(Preference preference) {
-
+        mHandler.removeCallbacks(mSyncRunnable);
+        mHandler.post(mSyncRunnable);
     }
 
     @Override
     public void onPreferenceVisibilityChange(Preference preference) {
+        if (!mPreferencesInternal.contains(preference)) return;
 
+        if (preference.isVisible()) {
+            int previousVisibleIndex = -1;
+            for (Preference pref : mPreferencesInternal) {
+                if (preference.equals(pref)) break;
+                if (pref.isVisible()) ++previousVisibleIndex;
+            }
+            mPreferences.add(previousVisibleIndex, preference);
+            notifyItemInserted(previousVisibleIndex);
+        } else {
+            int removalIndex;
+            int listSize = mPreferences.size();
+            for (removalIndex = 0; removalIndex < listSize; removalIndex++) {
+                if (preference.equals(mPreferences.get(removalIndex))) break;
+            }
+            mPreferences.remove(removalIndex);
+            notifyItemRemoved(removalIndex);
+        }
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        Preference item = getItem(position);
+        mTempLayout = createPreferenceLayout(item, mTempLayout);
+
+        int viewType = mPreferenceLayouts.indexOf(mTempLayout);
+
+        if (viewType != -1) return viewType;
+        else {
+            viewType = mPreferences.size();
+            mPreferenceLayouts.add(new PreferenceLayout(mTempLayout));
+            return viewType;
+        }
     }
 
     @NonNull
@@ -185,7 +231,7 @@ class PreferenceGroupAdapter extends RecyclerView.Adapter<PreferenceGroupAdapter
 
         View view = inflater.inflate(pl.resId, parent, false);
         if (view.getBackground() == null) {
-            view.setBackgroundDrawable(bg);
+            ViewCompat.setBackground(view, bg);
         }
 
         ViewGroup widgetFrame = view.findViewById(R.id.widget_frame);
@@ -204,30 +250,27 @@ class PreferenceGroupAdapter extends RecyclerView.Adapter<PreferenceGroupAdapter
     }
 
     @Override
-    public int getItemCount() {
-        return mPreferences.size();
-    }
-
-    @Override
-    public long getItemId(int position) {
-        if (!hasStableIds())
-            return RecyclerView.NO_ID;
-        return this.getItem(position).getId();
-    }
-
-    @Override
-    public int getItemViewType(int position) {
-        Preference item = getItem(position);
-        mTempLayout = createPreferenceLayout(item, mTempLayout);
-
-        int index = mPreferenceLayouts.indexOf(mTempLayout);
-
-        if (index != -1) return index;
-        else {
-            index = mPreferences.size();
-            mPreferenceLayouts.add(new PreferenceLayout(mTempLayout));
-            return index;
+    public int getPreferenceAdapterPosition(String key) {
+        int size = mPreferences.size();
+        for (int i = 0; i < size; i++) {
+            Preference candidate = mPreferences.get(i);
+            if (TextUtils.equals(key, candidate.getKey())) {
+                return i;
+            }
         }
+        return RecyclerView.NO_POSITION;
+    }
+
+    @Override
+    public int getPreferenceAdapterPosition(Preference preference) {
+        int size = mPreferences.size();
+        for (int i = 0; i < size; i++) {
+            Preference candidate = mPreferences.get(i);
+            if (candidate != null && candidate.equals(preference)) {
+                return i;
+            }
+        }
+        return RecyclerView.NO_POSITION;
     }
 
     private static class PreferenceLayout {
@@ -266,6 +309,8 @@ class PreferenceGroupAdapter extends RecyclerView.Adapter<PreferenceGroupAdapter
     public static class PreferenceViewHolder extends RecyclerView.ViewHolder {
 
         private final SparseArray<View> mCachedViews = new SparseArray<>(4);
+        private boolean mDividerAllowedAbove;
+        private boolean mDividerAllowedBelow;
 
         PreferenceViewHolder(View itemView) {
             super(itemView);
@@ -285,6 +330,22 @@ class PreferenceGroupAdapter extends RecyclerView.Adapter<PreferenceGroupAdapter
                 if (view != null) mCachedViews.put(id, view);
                 return view;
             }
+        }
+
+        public boolean isDividerAllowedAbove() {
+            return mDividerAllowedAbove;
+        }
+
+        public void setDividerAllowedAbove(boolean allowed) {
+            mDividerAllowedAbove = allowed;
+        }
+
+        public boolean isDividerAllowedBelow() {
+            return mDividerAllowedBelow;
+        }
+
+        public void setDividerAllowedBelow(boolean allowed) {
+            mDividerAllowedBelow = allowed;
         }
     }
 }

@@ -7,10 +7,11 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.RecyclerViewAccessibilityDelegate;
 import android.view.View;
 
+//completed
 class PreferenceRecyclerViewAccessibilityDelegate extends RecyclerViewAccessibilityDelegate {
 
     private RecyclerView mRecyclerView;
-    private AccessibilityDelegateCompat mDefaultItemDelegate = getItemDelegate();
+    private AccessibilityDelegateCompat mDefaultItemDelegate = super.getItemDelegate();
 
     private AccessibilityDelegateCompat mItemDelegate = new AccessibilityDelegateCompat() {
         @Override

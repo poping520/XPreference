@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-
+//Completed
 public class PreferenceGroup extends Preference {
 
     private List<Preference> mList;
@@ -83,7 +83,7 @@ public class PreferenceGroup extends Preference {
         int index = Collections.binarySearch(mList, preference);
         if (index < 0) index = -index - 1;
 
-        onPrepareAddPreference(preference);
+        if (!onPrepareAddPreference(preference)) return false;
 
         synchronized (this) {
             mList.add(index, preference);
@@ -95,9 +95,9 @@ public class PreferenceGroup extends Preference {
             id = mIdRecycleCache.get(key);
             mIdRecycleCache.remove(key);
         } else {
-            id = preferenceManager.getNextId();
+            id = mPreferenceManager.getNextId();
         }
-        preference.onAttachedToHierarchy(preferenceManager, id);
+        preference.onAttachedToHierarchy(mPreferenceManager, id);
         preference.assignParent(this);
 
         if (mAttachedToHierarchy) preference.onAttached();
