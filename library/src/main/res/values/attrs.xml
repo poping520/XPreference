@@ -7,6 +7,9 @@
         <attr name="preferenceCategoryStyle" format="reference" />
         <attr name="checkBoxPreferenceStyle" format="reference" />
         <attr name="switchPreferenceStyle" format="reference" />
+        <attr name="dialogPreferenceStyle" format="reference" />
+        <attr name="seekBarPreferenceStyle" format="reference" />
+        <attr name="editTextPreferenceStyle" format="reference" />
     </declare-styleable>
 
     <declare-styleable name="Preference">
@@ -41,9 +44,30 @@
     <declare-styleable name="SwitchPreference">
         <attr name="android:summaryOn" />
         <attr name="android:summaryOff" />
-        <attr name="android:switchTextOn"/>
+        <attr name="android:switchTextOn" />
         <attr name="android:switchTextOff" />
         <attr name="android:disableDependentsState" />
+    </declare-styleable>
+
+    <declare-styleable name="DialogPreference">
+        <attr name="android:dialogTitle" />
+        <attr name="android:dialogMessage" />
+        <attr name="android:dialogIcon" />
+        <attr name="android:positiveButtonText" />
+        <attr name="android:negativeButtonText" />
+        <attr name="android:dialogLayout" />
+    </declare-styleable>
+
+    <declare-styleable name="SeekBarPreference">
+        <attr name="android:min" />
+        <attr name="android:max" />
+        <attr name="android:layout" />
+    </declare-styleable>
+
+    <declare-styleable name="ListPreference">
+        <attr name="android:entries" />
+        <attr name="android:entryValues" />
+        <attr name="noPositiveButton" format="boolean" />
     </declare-styleable>
 
     <declare-styleable name="PreferenceGroup">

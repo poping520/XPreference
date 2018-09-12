@@ -3,9 +3,13 @@ package com.poping520.open.xpreference;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.support.annotation.Nullable;
 
 import com.poping520.open.xpreference.storage.SharedPrefsDataManager;
 import com.poping520.open.xpreference.storage.Storage;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class PreferenceManager {
 
@@ -45,6 +49,11 @@ public class PreferenceManager {
     public interface OnNavigateToScreenListener {
 
         void onNavigateToScreen(PreferenceScreen preferenceScreen);
+    }
+
+    public interface OnActivityDestroyListener {
+
+        void onActivityDestroy();
     }
 
 
@@ -103,5 +112,28 @@ public class PreferenceManager {
 
     public OnNavigateToScreenListener getOnNavigateToScreenListener() {
         return mOnNavigateToScreenListener;
+    }
+
+    @Nullable
+    private List<OnActivityDestroyListener> mActivityDestroyListeners;
+
+    void registerOnActivityDestroyListener(OnActivityDestroyListener listener) {
+        synchronized (this) {
+            if (mActivityDestroyListeners == null) {
+                mActivityDestroyListeners = new ArrayList<>();
+            }
+
+            if (!mActivityDestroyListeners.contains(listener)) {
+                mActivityDestroyListeners.add(listener);
+            }
+        }
+    }
+
+    void unregisterOnActivityDestroyListener(OnActivityDestroyListener listener) {
+        synchronized (this) {
+            if (mActivityDestroyListeners != null) {
+                mActivityDestroyListeners.remove(listener);
+            }
+        }
     }
 }

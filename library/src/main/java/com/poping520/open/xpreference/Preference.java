@@ -54,10 +54,10 @@ public class Preference implements Comparable<Preference> {
     protected Drawable icon;
     protected String key;
     protected CharSequence title;
-    protected String mSummary;
+    protected CharSequence mSummary;
     protected int mLayoutResId;
     protected int mWidgetLayoutResId;
-    protected boolean persistent;
+    protected boolean mPersistent;
     private String mDependencyKey;
     private String mFragment;
     private boolean mEnabled;
@@ -99,7 +99,7 @@ public class Preference implements Comparable<Preference> {
         key = a.getString(R.styleable.Preference_android_key);
         title = a.getText(R.styleable.Preference_android_title);
         mSummary = a.getString(R.styleable.Preference_android_summary);
-        persistent = a.getBoolean(R.styleable.Preference_android_persistent, true);
+        mPersistent = a.getBoolean(R.styleable.Preference_android_persistent, true);
         mOrder = a.getInt(R.styleable.Preference_android_order, DEFAULT_ORDER);
         mFragment = a.getString(R.styleable.Preference_android_fragment);
         mLayoutResId = a.getResourceId(R.styleable.Preference_android_layout, R.layout.xpreference_material);
@@ -457,8 +457,12 @@ public class Preference implements Comparable<Preference> {
         return mOnChangeListener == null || mOnChangeListener.onPreferenceChange(this, newValue);
     }
 
+    public boolean isPersistent() {
+        return mPersistent;
+    }
+
     private boolean shouldPersist() {
-        return persistent && hasKey();
+        return mPersistent && hasKey();
     }
 
     protected boolean persistString(String value) {
@@ -576,6 +580,18 @@ public class Preference implements Comparable<Preference> {
 
     public CharSequence getTitle() {
         return title;
+    }
+
+    public void setSummary(CharSequence summary) {
+        if ((summary == null && mSummary != null)
+                || (summary != null && !summary.equals(mSummary))) {
+            mSummary = summary;
+            notifyChanged();
+        }
+    }
+
+    public CharSequence getSummary() {
+        return mSummary;
     }
 
     protected void notifyChanged() {

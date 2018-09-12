@@ -7,10 +7,10 @@ import android.util.AttributeSet;
 import android.view.View;
 import android.view.accessibility.AccessibilityManager;
 import android.widget.Checkable;
-import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.Switch;
 
+//completed
 public class SwitchPreference extends TwoStatePreference {
 
     private CharSequence mSwitchOn;
@@ -31,7 +31,10 @@ public class SwitchPreference extends TwoStatePreference {
                 R.styleable.SwitchPreference, defStyleAttr, defStyleRes);
         setSummaryOn(a.getString(R.styleable.SwitchPreference_android_summaryOn));
         setSummaryOff(a.getString(R.styleable.SwitchPreference_android_summaryOff));
-
+        setSwitchTextOn(a.getString(R.styleable.SwitchPreference_android_switchTextOn));
+        setSwitchTextOff(a.getString(R.styleable.SwitchPreference_android_switchTextOff));
+        setDisableDependentsState(
+                a.getBoolean(R.styleable.SwitchPreference_android_disableDependentsState, false));
         a.recycle();
     }
 

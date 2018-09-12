@@ -18,12 +18,17 @@ public class MainActivity extends AppCompatActivity {
 
         SampleFragment sampleFragment = new SampleFragment();
         SampleFragmentV7 sampleFragmentV7 = new SampleFragmentV7();
+        SampleFragmentApp sampleFragmentApp = new SampleFragmentApp();
 
         getSupportFragmentManager()
                 .beginTransaction()
                 .replace(R.id.main, sampleFragment)
                 .commit();
 
+//        getFragmentManager()
+//                .beginTransaction()
+//                .replace(R.id.main, sampleFragmentApp)
+//                .commit();
     }
 
     public static class SampleFragment extends PreferenceFragment {
@@ -31,7 +36,6 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected void onCreatePreferences(@Nullable Bundle savedInstanceState) {
             addPreferencesFromResource(R.xml.xpref_sample);
-
         }
     }
 
@@ -41,6 +45,14 @@ public class MainActivity extends AppCompatActivity {
         public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
             addPreferencesFromResource(R.xml.xpref_sample);
         }
+    }
 
+    public static class SampleFragmentApp extends android.preference.PreferenceFragment {
+
+        @Override
+        public void onCreate(@Nullable Bundle savedInstanceState) {
+            super.onCreate(savedInstanceState);
+            addPreferencesFromResource(R.xml.xpref_sample);
+        }
     }
 }

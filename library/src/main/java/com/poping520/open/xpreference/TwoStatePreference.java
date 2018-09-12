@@ -154,7 +154,7 @@ public abstract class TwoStatePreference extends Preference {
     @Override
     protected Parcelable onSaveInstanceState() {
         final Parcelable superState = super.onSaveInstanceState();
-        if (persistent) {
+        if (mPersistent) {
             return superState;
         }
 

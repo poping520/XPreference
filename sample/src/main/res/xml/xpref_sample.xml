@@ -2,21 +2,30 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <PreferenceCategory android:title="PreferenceCategory" >
+    <PreferenceCategory android:title="PreferenceCategory">
 
         <CheckBoxPreference
             android:key="checkbox"
             android:summary="This is CheckBox"
             android:title="CheckBox" />
 
+        <ListPreference
+            android:entries="@array/TestArr"
+            android:entryValues="@array/TestArr"
+            android:key="list"
+            android:negativeButtonText="取消"
+            android:positiveButtonText="确定"
+            android:summary="This is ListPreference"
+            android:title="ListPreference"
+            app:noPositiveButton="false" />
+
     </PreferenceCategory>
 
 
-
     <!--<SwitchPreference-->
-        <!--android:key="switch"-->
-        <!--android:summary="This is Switch"-->
-        <!--android:title="Switch" />-->
+    <!--android:key="switch"-->
+    <!--android:summary="This is Switch"-->
+    <!--android:title="Switch" />-->
 
 
 </PreferenceScreen>
