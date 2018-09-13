@@ -5,7 +5,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.support.annotation.Nullable;
 
-import com.poping520.open.xpreference.storage.SharedPrefsDataManager;
+import com.poping520.open.xpreference.storage.SharedPreferenceStorage;
 import com.poping520.open.xpreference.storage.Storage;
 
 import java.util.ArrayList;
@@ -71,7 +71,7 @@ public class PreferenceManager {
         if (mSharedPrefs == null) {
             mSharedPrefs = mContext.getSharedPreferences(mContext.getPackageName() + "_preference", Context.MODE_PRIVATE);
         }
-        mStorage = new SharedPrefsDataManager(mSharedPrefs);
+        mStorage = new SharedPreferenceStorage(mSharedPrefs);
         return mStorage;
     }
 

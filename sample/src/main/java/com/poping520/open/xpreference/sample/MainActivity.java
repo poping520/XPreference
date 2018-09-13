@@ -8,6 +8,7 @@ import android.support.v7.preference.Preference;
 import android.support.v7.preference.PreferenceFragmentCompat;
 
 import com.poping520.open.xpreference.PreferenceFragment;
+import com.poping520.open.xpreference.storage.JSONStorage;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -35,6 +36,8 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         protected void onCreatePreferences(@Nullable Bundle savedInstanceState) {
+            getPreferenceManager().setStorage(new JSONStorage(
+                    getActivity().getFilesDir().getAbsolutePath() + "/preference.json"));
             addPreferencesFromResource(R.xml.xpref_sample);
         }
     }

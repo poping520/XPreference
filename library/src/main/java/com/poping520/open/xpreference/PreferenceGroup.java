@@ -120,14 +120,14 @@ public class PreferenceGroup extends Preference {
             }
             boolean success = mList.remove(preference);
             if (success) {
-                // If this preference, or another preference with the same key, gets re-added
+                // If this preference, or another preference with the same mKey, gets re-added
                 // immediately, we want it to have the same id so that it can be correctly tracked
                 // in the adapter by RecyclerView, to make it appear as if it has only been
                 // seamlessly updated. If the preference is not re-added by the time the handler
                 // runs, we take that as a signal that the preference will not be re-added soon
                 // in which case it does not need to retain the same id.
 
-                // If two (or more) preferences have the same (or null) key and both are removed
+                // If two (or more) preferences have the same (or null) mKey and both are removed
                 // and then re-added, only one id will be recycled and the second (and later)
                 // preferences will receive a newly generated id. This use pattern of the preference
                 // API is strongly discouraged.

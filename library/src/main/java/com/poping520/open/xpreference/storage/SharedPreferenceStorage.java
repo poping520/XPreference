@@ -11,12 +11,12 @@ import java.util.Set;
  * @author poping520
  * @version 1.0.0
  */
-public class SharedPrefsDataManager implements Storage {
+public class SharedPreferenceStorage implements Storage {
 
     private SharedPreferences mSharedPrefs;
     private SharedPreferences.Editor mEditor;
 
-    public SharedPrefsDataManager(SharedPreferences sharedPrefs) {
+    public SharedPreferenceStorage(SharedPreferences sharedPrefs) {
         mSharedPrefs = sharedPrefs;
         mEditor = mSharedPrefs.edit();
         mEditor.apply();
@@ -74,22 +74,22 @@ public class SharedPrefsDataManager implements Storage {
     }
 
     @Override
+    public boolean getBoolean(String key, boolean defaultValue) {
+        return mSharedPrefs.getBoolean(key, defaultValue);
+    }
+
+    @Override
     public String getString(String key, @Nullable String defaultValue) {
         return mSharedPrefs.getString(key, defaultValue);
     }
 
     @Override
-    public Set<String> getStringSet(String key, Set<String> defaultValue) {
+    public Set<String> getStringSet(String key, @Nullable Set<String> defaultValue) {
         return mSharedPrefs.getStringSet(key, defaultValue);
     }
 
     @Override
     public boolean contains(String key) {
         return mSharedPrefs.contains(key);
-    }
-
-    @Override
-    public boolean getBoolean(String key, boolean defaultValue) {
-        return mSharedPrefs.getBoolean(key, defaultValue);
     }
 }

@@ -194,7 +194,7 @@ public abstract class DialogPreference extends Preference {
 
     @CallSuper
     protected void onBindDialogView(View view) {
-        View dialogMessageView = view.findViewById(android.R.id.message);
+        View dialogMessageView = view.findViewById(R.id.message);
         if (dialogMessageView != null) {
             final CharSequence message = getDialogMessage();
             int newVisibility = View.GONE;

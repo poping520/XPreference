@@ -13,17 +13,26 @@
             android:entries="@array/TestArr"
             android:entryValues="@array/TestArr"
             android:key="list"
-            android:negativeButtonText="取消"
-            android:positiveButtonText="确定"
+            android:negativeButtonText="cancel"
+            android:positiveButtonText="confirm"
             android:summary="This is ListPreference"
             android:title="ListPreference"
             app:noPositiveButton="false" />
+
+        <EditTextPreference
+            android:dialogMessage="Dialog Message"
+            android:hint="INPUT SOMETHING"
+            android:key="edittext"
+            android:negativeButtonText="cancel"
+            android:positiveButtonText="confirm"
+            android:summary="This is EditText"
+            android:title="EditText" />
 
     </PreferenceCategory>
 
 
     <!--<SwitchPreference-->
-    <!--android:key="switch"-->
+    <!--android:mKey="switch"-->
     <!--android:summary="This is Switch"-->
     <!--android:title="Switch" />-->
 

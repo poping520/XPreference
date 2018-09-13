@@ -99,7 +99,6 @@ public abstract class PreferenceFragment extends Fragment implements
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
         if (mHavePrefs) {
             bindPreferences();
             if (mSelectPreferenceRunnable != null) {
@@ -107,7 +106,6 @@ public abstract class PreferenceFragment extends Fragment implements
                 mSelectPreferenceRunnable = null;
             }
         }
-
         mInitDone = true;
     }
 
@@ -127,6 +125,28 @@ public abstract class PreferenceFragment extends Fragment implements
         super.onStart();
         mPreferenceManager.setOnPreferenceTreeClickListener(this);
         mPreferenceManager.setOnDisplayPreferenceDialogListener(this);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        mPreferenceManager.setOnPreferenceTreeClickListener(null);
+        mPreferenceManager.setOnDisplayPreferenceDialogListener(null);
+    }
+
+    @Override
+    public void onDestroyView() {
+        mHandler.removeCallbacks(mRequestFocus);
+        mHandler.removeMessages(MSG_BIND_PREFERENCES);
+        if (mHavePrefs) {
+            unbindPreferences();
+        }
+        mRecyclerView = null;
+        super.onDestroyView();
+    }
+
+    public PreferenceManager getPreferenceManager() {
+        return mPreferenceManager;
     }
 
     public PreferenceScreen getPreferenceScreen() {

@@ -47,7 +47,7 @@ public interface Storage {
     String getString(String key, @Nullable String defaultValue);
 
 
-    Set<String> getStringSet(String key, Set<String> defaultValue);
+    Set<String> getStringSet(String key, @Nullable Set<String> defaultValue);
 
 
     boolean contains(String key);
