@@ -2,6 +2,7 @@ package com.poping520.open.xpreference.storage;
 
 import android.support.annotation.Nullable;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -20,15 +21,14 @@ import java.util.Set;
  */
 public class JSONStorage implements Storage {
 
-    private static final String TAG = "JSONStorage";
-
     private JSONObject mJSONObject;
-
     private File mJSONFile;
 
     public JSONStorage(File jsonFile) {
         mJSONFile = jsonFile;
-        if (mJSONFile.exists()) {
+        if (!mJSONFile.exists()) {
+            mJSONObject = new JSONObject();
+        } else {
             BufferedReader br = null;
             try {
                 StringBuilder sb = new StringBuilder();
@@ -53,9 +53,6 @@ public class JSONStorage implements Storage {
                     e.printStackTrace();
                 }
             }
-
-        } else {
-            mJSONObject = new JSONObject();
         }
     }
 
@@ -65,61 +62,54 @@ public class JSONStorage implements Storage {
 
     @Override
     public boolean saveInt(String key, int value) {
-        return false;
+        return save(key, value);
     }
 
     @Override
     public boolean saveLong(String key, long value) {
-        return false;
+        return save(key, value);
     }
 
     @Override
     public boolean saveFloat(String key, float value) {
-        return false;
+        return save(key, value);
     }
 
     @Override
     public boolean saveBoolean(String key, boolean value) {
-        try {
-            mJSONObject.put(key, value);
-            save();
-            return true;
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        return false;
+        return save(key, value);
     }
 
     @Override
     public boolean saveString(String key, String value) {
-        try {
-            mJSONObject.put(key, value);
-            save();
-            return true;
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        return false;
+        return save(key, value);
     }
 
     @Override
     public boolean saveStringSet(String key, Set<String> value) {
+        JSONArray jArr = new JSONArray(value);
+        try {
+            mJSONObject.put(key, jArr);
+            return updateFile();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
         return false;
     }
 
     @Override
     public int getInt(String key, int defaultValue) {
-        return 0;
+        return mJSONObject.optInt(key, defaultValue);
     }
 
     @Override
     public long getLong(String key, long defaultValue) {
-        return 0;
+        return mJSONObject.optLong(key, defaultValue);
     }
 
     @Override
     public float getFloat(String key, float defaultValue) {
-        return 0;
+        return (float) mJSONObject.optDouble(key, defaultValue);
     }
 
     @Override
@@ -134,6 +124,8 @@ public class JSONStorage implements Storage {
 
     @Override
     public Set<String> getStringSet(String key, @Nullable Set<String> defaultValue) {
+        JSONArray jArr = mJSONObject.optJSONArray(key);
+
         return null;
     }
 
@@ -142,12 +134,23 @@ public class JSONStorage implements Storage {
         return mJSONObject.has(key);
     }
 
-    private void save() {
+    private boolean save(String key, Object value) {
+        try {
+            mJSONObject.put(key, value);
+            return updateFile();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    private boolean updateFile() {
         BufferedWriter bw = null;
         try {
             bw = new BufferedWriter(new FileWriter(mJSONFile));
             bw.write(mJSONObject.toString());
             bw.flush();
+            return true;
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
@@ -159,5 +162,6 @@ public class JSONStorage implements Storage {
                 e.printStackTrace();
             }
         }
+        return false;
     }
 }
