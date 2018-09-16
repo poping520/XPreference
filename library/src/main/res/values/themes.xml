@@ -7,5 +7,6 @@
         <item name="switchPreferenceStyle">@style/Preference.SwitchPreference</item>
         <item name="dialogPreferenceStyle">@style/Preference.DialogPreference</item>
         <item name="editTextPreferenceStyle">@style/Preference.DialogPreference.EditTextPreference</item>
+        <item name="optionEditTextPreferenceStyle">@style/Preference.DialogPreference.OptionEditTextPreference</item>
     </style>
 </resources>

@@ -16,6 +16,7 @@ import android.support.annotation.StringRes;
 import android.support.v4.content.ContextCompat;
 import android.text.TextUtils;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.Window;
@@ -29,10 +30,10 @@ public abstract class DialogPreference extends Preference {
     private Drawable mDialogIcon;
     private CharSequence mPositiveButtonText;
     private CharSequence mNegativeButtonText;
-    //private CharSequence m
+    private CharSequence mNeutralButtonText;
     private int mDialogLayoutResId;
 
-    private Dialog mDialog;
+    private AlertDialog mDialog;
     private AlertDialog.Builder mBuilder;
     private int mWhichButtonClicked;
 
@@ -47,6 +48,7 @@ public abstract class DialogPreference extends Preference {
         mPositiveButtonText = a.getString(R.styleable.DialogPreference_android_positiveButtonText);
         mNegativeButtonText = a.getString(R.styleable.DialogPreference_android_negativeButtonText);
         mDialogLayoutResId = a.getResourceId(R.styleable.DialogPreference_android_dialogLayout, 0);
+        mNeutralButtonText = a.getString(R.styleable.DialogPreference_neutralButtonText);
         a.recycle();
     }
 
@@ -122,6 +124,18 @@ public abstract class DialogPreference extends Preference {
         return mNegativeButtonText;
     }
 
+    public void setNeutralButtonText(CharSequence neutralButtonText) {
+        mNeutralButtonText = neutralButtonText;
+    }
+
+    public void setNeutralButtonText(@StringRes int neutralButtonTextResId) {
+        setNeutralButtonText(mContext.getString(neutralButtonTextResId));
+    }
+
+    public CharSequence getNeutralButtonText() {
+        return mNeutralButtonText;
+    }
+
     public void setDialogLayoutResource(int dialogLayoutResId) {
         mDialogLayoutResId = dialogLayoutResId;
     }
@@ -148,6 +162,10 @@ public abstract class DialogPreference extends Preference {
                 .setPositiveButton(mPositiveButtonText, this::onClick)
                 .setNegativeButton(mNegativeButtonText, this::onClick);
 
+        if (!TextUtils.isEmpty(mNeutralButtonText)) {
+            mBuilder.setNeutralButton(mNeutralButtonText, this::onClick);
+        }
+
         View contentView = onCreateDialogView();
         if (contentView != null) {
             onBindDialogView(contentView);
@@ -161,6 +179,7 @@ public abstract class DialogPreference extends Preference {
 
         // Create the dialog
         final Dialog dialog = mDialog = mBuilder.create();
+
         if (state != null) {
             dialog.onRestoreInstanceState(state);
         }
@@ -169,6 +188,11 @@ public abstract class DialogPreference extends Preference {
         }
         dialog.setOnDismissListener(this::onDismiss);
         dialog.show();
+
+        onDialogShowed(mDialog);
+    }
+
+    protected void onDialogShowed(AlertDialog dialog) {
 
     }
 

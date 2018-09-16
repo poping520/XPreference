@@ -1,5 +1,10 @@
 package com.poping520.open.xpreference.sample;
 
+import android.app.Dialog;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
+import android.preference.EditTextPreference;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
@@ -10,6 +15,8 @@ import android.support.v7.preference.PreferenceFragmentCompat;
 import com.poping520.open.xpreference.PreferenceFragment;
 import com.poping520.open.xpreference.storage.JSONStorage;
 import com.poping520.open.xpreference.storage.PropertiesStorage;
+
+import java.util.Random;
 
 public class MainActivity extends AppCompatActivity {
 

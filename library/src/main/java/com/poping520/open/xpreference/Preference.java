@@ -290,7 +290,7 @@ public class Preference implements Comparable<Preference> {
     /**
      * different Preference maybe has different value type.
      * so, if your sub Preference has default value, you should
-     * overwrite this method to confirm the value type which it is.
+     * overwrite this method to confirm the value type which it hasEntries.
      */
     protected Object onGetDefaultValue(TypedArray a, int index) {
         return null;

@@ -10,6 +10,7 @@
         <attr name="dialogPreferenceStyle" format="reference" />
         <attr name="seekBarPreferenceStyle" format="reference" />
         <attr name="editTextPreferenceStyle" format="reference" />
+        <attr name="optionEditTextPreferenceStyle" format="reference" />
     </declare-styleable>
 
     <declare-styleable name="Preference">
@@ -56,6 +57,15 @@
         <attr name="android:positiveButtonText" />
         <attr name="android:negativeButtonText" />
         <attr name="android:dialogLayout" />
+        <attr name="neutralButtonText" format="string" />
+    </declare-styleable>
+
+    <!-- base on EditTextPreference, can provider some options to select -->
+    <declare-styleable name="OptionEditTextPreference">
+        <attr name="entries" format="reference" />
+        <attr name="entryValues" format="reference" />
+        <!-- the random button (random choice a option from options) switch -->
+        <attr name="randomButtonText" format="string" />
     </declare-styleable>
 
     <declare-styleable name="SeekBarPreference">

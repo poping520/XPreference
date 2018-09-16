@@ -22,18 +22,30 @@
         <EditTextPreference
             android:dialogMessage="Dialog Message"
             android:hint="INPUT SOMETHING"
-            android:key="edittext"
+            android:key="editText"
             android:negativeButtonText="cancel"
             android:positiveButtonText="confirm"
-            android:summary="This is EditText"
-            android:title="EditText" />
+            android:summary="This is EditTextPreference"
+            android:title="EditText"
+            app:neutralButtonText="Neutral" />
+
+        <OptionEditTextPreference
+            android:dialogMessage="Dialog Message"
+            android:hint="INPUT SOMETHING"
+            android:key="optionEditText"
+            android:summary="This is OptionEditTextPreference"
+            android:title="OptionEditTextPreference"
+            app:entries="@array/TestArr"
+            app:entryValues="@array/TestArr"
+            app:randomButtonText="随机" />
+
 
     </PreferenceCategory>
 
 
     <!--<SwitchPreference-->
     <!--android:mKey="switch"-->
-    <!--android:summary="This is Switch"-->
+    <!--android:summary="This hasEntries Switch"-->
     <!--android:title="Switch" />-->
 
 

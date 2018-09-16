@@ -28,11 +28,15 @@
 
     <style name="Preference.DialogPreference.EditTextPreference">
         <item name="android:dialogLayout">@layout/xpreference_dialog_edittext</item>
-    </style>x
+    </style>
+
+    <style name="Preference.DialogPreference.OptionEditTextPreference">
+        <item name="android:dialogLayout">@layout/xpreference_dialog_option_edittext</item>
+    </style>
 
     <style name="Preference_TextAppearanceMaterialBody2">
         <item name="android:textSize">14sp</item>
-        <item tools:ignore="NewApi" name="android:fontFamily">sans-serif</item>
+        <item name="android:fontFamily" tools:ignore="NewApi">sans-serif</item>
         <item name="android:textColor">?android:attr/textColorPrimary</item>
         <item name="android:textStyle">normal</item>
     </style>

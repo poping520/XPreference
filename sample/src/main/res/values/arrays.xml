@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string-array name="TestArr">
-        <item>A</item>
-        <item>B</item>
-        <item>C</item>
-        <item>D</item>
-        <item>E</item>
+        <item>Apple</item>
+        <item>Google</item>
+        <item>Amazon</item>
+        <item>Microsoft</item>
+        <item>Alibaba</item>
     </string-array>
 </resources>
