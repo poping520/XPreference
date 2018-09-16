@@ -2,6 +2,7 @@
 <resources>
 
     <style name="XPreferenceTheme">
+        <item name="preferenceScreenStyle">@style/Preference.PreferenceScreen</item>
         <item name="preferenceCategoryStyle">@style/Preference.Category</item>
         <item name="checkBoxPreferenceStyle">@style/Preference.CheckBoxPreference</item>
         <item name="switchPreferenceStyle">@style/Preference.SwitchPreference</item>

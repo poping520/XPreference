@@ -12,7 +12,6 @@ import android.support.v4.view.ViewCompat;
 import android.support.v7.util.DiffUtil;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
-import android.util.Log;
 import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -76,7 +75,7 @@ class PreferenceGroupAdapter extends RecyclerView.Adapter<PreferenceGroupAdapter
         mPreferences = newVisibleList;
         mPreferencesInternal = fullList;
 
-        PreferenceManager mgr = mPreferenceGroup.getPreferenceManager();
+        PreferenceManager mgr = mPreferenceGroup.getXPreferenceManager();
         if (mgr != null && mgr.getPreferenceComparisonCallback() != null) {
             PreferenceManager.PreferenceComparisonCallback callback = mgr.getPreferenceComparisonCallback();
 

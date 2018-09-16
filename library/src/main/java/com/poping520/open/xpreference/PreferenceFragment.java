@@ -179,8 +179,9 @@ public abstract class PreferenceFragment extends Fragment implements
     }
 
 
-    public Preference findPreference(CharSequence key) {
-        return getPreferenceScreen().findPreference(key);
+    @SuppressWarnings("unchecked")
+    public <T extends Preference> T findPreference(CharSequence key) {
+        return (T) getPreferenceScreen().findPreference(key);
     }
 
     public PreferenceScreen inflateFromResource(@XmlRes int resId, PreferenceScreen rootPreferences) {

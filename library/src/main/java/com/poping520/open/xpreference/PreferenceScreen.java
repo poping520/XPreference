@@ -17,7 +17,7 @@ public class PreferenceScreen extends PreferenceGroup {
             return;
 
         PreferenceManager.OnNavigateToScreenListener listener =
-                getPreferenceManager().getOnNavigateToScreenListener();
+                getXPreferenceManager().getOnNavigateToScreenListener();
 
         if (listener != null)
             listener.onNavigateToScreen(this);

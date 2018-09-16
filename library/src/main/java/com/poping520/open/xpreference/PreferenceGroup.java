@@ -13,7 +13,7 @@ import java.util.Collections;
 import java.util.List;
 
 //Completed
-public class PreferenceGroup extends Preference {
+public abstract class PreferenceGroup extends Preference {
 
     private List<Preference> mList;
 
@@ -115,7 +115,7 @@ public class PreferenceGroup extends Preference {
     private boolean removePreferenceInt(Preference preference) {
         synchronized (this) {
             preference.onPrepareForRemoval();
-            if (preference.getParent() == this) {
+            if (preference.getXParent() == this) {
                 preference.assignParent(null);
             }
             boolean success = mList.remove(preference);

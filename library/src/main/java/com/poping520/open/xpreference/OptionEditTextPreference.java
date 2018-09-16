@@ -18,6 +18,9 @@ import android.widget.ImageButton;
 import android.widget.ListAdapter;
 import android.widget.ListPopupWindow;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 /**
@@ -158,6 +161,26 @@ public class OptionEditTextPreference extends EditTextPreference {
         }
         if (minWidth > maxWidth) return minWidth;
         else return maxWidth;
+    }
+
+    public void setEntries(String[] entries) {
+        mEntries = entries;
+    }
+
+    public void setEntries(List<String> entries) {
+        mEntries = entries.toArray(new String[]{});
+    }
+
+    public void setEntryValues(String[] entryValues) {
+        mEntryValues = entryValues;
+    }
+
+    public void setEntryValues(List<String> entryValues) {
+        mEntryValues = entryValues.toArray(new String[]{});
+    }
+
+    public String[] getEntryValues() {
+        return mEntryValues;
     }
 
     private static class RandomInt {

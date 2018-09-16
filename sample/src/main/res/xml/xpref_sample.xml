@@ -2,7 +2,7 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <PreferenceCategory android:title="PreferenceCategory">
+    <PreferenceCategory android:title="PreferenceCategory 1">
 
         <CheckBoxPreference
             android:key="checkbox"
@@ -29,7 +29,11 @@
             android:title="EditText"
             app:neutralButtonText="Neutral" />
 
-        <OptionEditTextPreference
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="PreferenceCategory 2">
+
+        <com.poping520.open.xpreference.OptionEditTextPreference
             android:dialogMessage="Dialog Message"
             android:hint="INPUT SOMETHING"
             android:key="optionEditText"
@@ -39,14 +43,6 @@
             app:entryValues="@array/TestArr"
             app:randomButtonText="随机" />
 
-
     </PreferenceCategory>
-
-
-    <!--<SwitchPreference-->
-    <!--android:mKey="switch"-->
-    <!--android:summary="This hasEntries Switch"-->
-    <!--android:title="Switch" />-->
-
 
 </PreferenceScreen>

@@ -27,8 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-
-public class Preference implements Comparable<Preference> {
+public class Preference extends android.preference.Preference {
 
     private static final String TAG = "Preference";
 
@@ -53,7 +52,6 @@ public class Preference implements Comparable<Preference> {
 
     protected int iconResId;
     protected Drawable icon;
-    protected String mKey;
     protected CharSequence title;
     protected CharSequence mSummary;
     protected int mLayoutResId;
@@ -92,12 +90,12 @@ public class Preference implements Comparable<Preference> {
     }
 
     public Preference(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
+        super(context, attrs, defStyleAttr, defStyleRes);
         this.mContext = context;
 
         final TypedArray a = this.mContext.obtainStyledAttributes(attrs, R.styleable.Preference, defStyleAttr, defStyleRes);
 
         iconResId = a.getResourceId(R.styleable.Preference_android_icon, 0);
-        mKey = a.getString(R.styleable.Preference_android_key);
         title = a.getText(R.styleable.Preference_android_title);
         mSummary = a.getString(R.styleable.Preference_android_summary);
         mPersistent = a.getBoolean(R.styleable.Preference_android_persistent, true);
@@ -132,7 +130,7 @@ public class Preference implements Comparable<Preference> {
     }
 
     public Preference(Context context, AttributeSet attrs) {
-        this(context, attrs, 0);
+        this(context, attrs, R.attr.preferenceStyle);
     }
 
     public Preference(Context context) {
@@ -144,6 +142,7 @@ public class Preference implements Comparable<Preference> {
     }
 
     public void onPrepareForRemoval() {
+        super.onPrepareForRemoval();
         unregisterDependency();
     }
 
@@ -217,7 +216,7 @@ public class Preference implements Comparable<Preference> {
                 throw new IllegalStateException("Derived class did not call super.onSaveInstanceState()");
             }
             if (state != null) {
-                container.putParcelable(mKey, state);
+                container.putParcelable(getKey(), state);
             }
         }
     }
@@ -233,7 +232,7 @@ public class Preference implements Comparable<Preference> {
 
     void dispatchRestoreInstanceState(Bundle bundle) {
         if (!hasKey()) return;
-        Parcelable state = bundle.getParcelable(mKey);
+        Parcelable state = bundle.getParcelable(getKey());
         if (state != null) {
             mBaseMethodCalled = false;
             onRestoreInstanceState(state);
@@ -251,7 +250,7 @@ public class Preference implements Comparable<Preference> {
     }
 
     @Nullable
-    public PreferenceGroup getParent() {
+    public PreferenceGroup getXParent() {
         return mParentGroup;
     }
 
@@ -382,10 +381,6 @@ public class Preference implements Comparable<Preference> {
 
     }
 
-    public boolean hasKey() {
-        return !TextUtils.isEmpty(mKey);
-    }
-
     public void onAttachedToHierarchy(PreferenceManager preferenceManager) {
         this.mPreferenceManager = preferenceManager;
         mStorage = preferenceManager.getStorage();
@@ -403,7 +398,7 @@ public class Preference implements Comparable<Preference> {
     }
 
     private void dispatchSetInitialValue() {
-        if (!shouldPersist() || !mStorage.contains(mKey)) {
+        if (!shouldPersist() || !mStorage.contains(getKey())) {
             if (defaultValue != null) {
                 onSetInitialValue(false, defaultValue);
             }
@@ -466,87 +461,68 @@ public class Preference implements Comparable<Preference> {
         return mPersistent;
     }
 
-    private boolean shouldPersist() {
+    protected boolean shouldPersist() {
         return mPersistent && hasKey();
     }
 
     protected boolean persistInt(int value) {
         return shouldPersist() && (value == getPersistedInt(~value)
-                || mStorage.saveInt(mKey, value));
+                || mStorage.saveInt(getKey(), value));
     }
 
     protected int getPersistedInt(int defaultValue) {
         if (!shouldPersist()) return defaultValue;
-        return mStorage.getInt(mKey, defaultValue);
+        return mStorage.getInt(getKey(), defaultValue);
     }
 
     protected boolean persistLong(long value) {
         return shouldPersist() && (value == getPersistedLong(~value)
-                || mStorage.saveLong(mKey, value));
+                || mStorage.saveLong(getKey(), value));
     }
 
     protected long getPersistedLong(long defaultValue) {
         if (!shouldPersist()) return defaultValue;
-        return mStorage.getLong(mKey, defaultValue);
+        return mStorage.getLong(getKey(), defaultValue);
     }
 
     protected boolean persistFloat(float value) {
         return shouldPersist() && (value == getPersistedFloat(Float.NaN)
-                || mStorage.saveFloat(mKey, value));
+                || mStorage.saveFloat(getKey(), value));
     }
 
     protected float getPersistedFloat(float defaultValue) {
         if (!shouldPersist()) return defaultValue;
-        return mStorage.getFloat(mKey, defaultValue);
+        return mStorage.getFloat(getKey(), defaultValue);
     }
 
     protected boolean persistBoolean(boolean value) {
         return shouldPersist() && (value == getPersistedBoolean(!value)
-                || mStorage.saveBoolean(mKey, value));
+                || mStorage.saveBoolean(getKey(), value));
     }
 
     protected boolean getPersistedBoolean(boolean defaultValue) {
         if (!shouldPersist()) return defaultValue;
-        return mStorage.getBoolean(mKey, defaultValue);
+        return mStorage.getBoolean(getKey(), defaultValue);
     }
 
     protected boolean persistString(String value) {
         return shouldPersist() && (TextUtils.equals(value, getPersistedString(null))
-                || mStorage.saveString(mKey, value));
+                || mStorage.saveString(getKey(), value));
     }
 
     protected String getPersistedString(String defaultValue) {
         if (!shouldPersist()) return defaultValue;
-        return mStorage.getString(mKey, defaultValue);
+        return mStorage.getString(getKey(), defaultValue);
     }
 
-    protected boolean persistStringSet(Set<String> values) {
+    public boolean persistStringSet(Set<String> values) {
         return shouldPersist() && (values.equals(getPersistedStringSet(null))
-                || mStorage.saveStringSet(mKey, values));
-
+                || mStorage.saveStringSet(getKey(), values));
     }
 
-    protected Set<String> getPersistedStringSet(Set<String> defaultValue) {
+    public Set<String> getPersistedStringSet(Set<String> defaultValue) {
         if (!shouldPersist()) return defaultValue;
-        return mStorage.getStringSet(mKey, defaultValue);
-    }
-
-    @Override
-    public int compareTo(@NonNull Preference another) {
-        if (mOrder != another.mOrder) {
-            // Do order comparison
-            return mOrder - another.mOrder;
-        } else if (title == another.title) {
-            // If titles are null or share same object comparison
-            return 0;
-        } else if (title == null) {
-            return 1;
-        } else if (another.title == null) {
-            return -1;
-        } else {
-            // Do name comparison
-            return title.toString().compareToIgnoreCase(another.title.toString());
-        }
+        return mStorage.getStringSet(getKey(), defaultValue);
     }
 
     public void setIntent(Intent intent) {
@@ -589,11 +565,6 @@ public class Preference implements Comparable<Preference> {
 
     public int getWidgetLayoutResource() {
         return mWidgetLayoutResId;
-    }
-
-
-    public String getKey() {
-        return mKey;
     }
 
     public void setOrder(int order) {
@@ -646,7 +617,7 @@ public class Preference implements Comparable<Preference> {
         }
     }
 
-    public PreferenceManager getPreferenceManager() {
+    public PreferenceManager getXPreferenceManager() {
         return mPreferenceManager;
     }
 

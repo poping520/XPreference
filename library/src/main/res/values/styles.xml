@@ -5,6 +5,10 @@
         <item name="android:layout">@layout/xpreference_material</item>
     </style>
 
+    <style name="Preference.PreferenceScreen">
+        <item name="android:layout">@layout/xpreference_material</item>
+    </style>
+
     <style name="Preference.Category">
         <item name="android:layout">@layout/xpreference_category_material</item>
         <item name="android:shouldDisableView">false</item>

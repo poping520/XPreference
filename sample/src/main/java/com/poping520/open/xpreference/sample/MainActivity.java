@@ -11,11 +11,15 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.preference.Preference;
 import android.support.v7.preference.PreferenceFragmentCompat;
+import android.util.Log;
 
+import com.poping520.open.xpreference.ListPreference;
+import com.poping520.open.xpreference.OptionEditTextPreference;
 import com.poping520.open.xpreference.PreferenceFragment;
 import com.poping520.open.xpreference.storage.JSONStorage;
 import com.poping520.open.xpreference.storage.PropertiesStorage;
 
+import java.io.File;
 import java.util.Random;
 
 public class MainActivity extends AppCompatActivity {
@@ -47,6 +51,10 @@ public class MainActivity extends AppCompatActivity {
             PropertiesStorage storage = new PropertiesStorage("/sdcard/000/text.prop");
             getPreferenceManager().setStorage(storage);
             addPreferencesFromResource(R.xml.xpref_sample);
+
+            OptionEditTextPreference list = findPreference("optionEditText");
+
+
         }
     }
 
