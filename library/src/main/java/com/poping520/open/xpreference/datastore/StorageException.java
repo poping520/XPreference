@@ -1,4 +1,4 @@
-package com.poping520.open.xpreference.storage;
+package com.poping520.open.xpreference.datastore;
 
 /**
  * Created by WangKZ on 18/09/15.

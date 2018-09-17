@@ -2,47 +2,69 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <PreferenceCategory android:title="PreferenceCategory 1">
 
-        <CheckBoxPreference
-            android:key="checkbox"
-            android:summary="This is CheckBox"
-            android:title="CheckBox" />
+    <CheckBoxPreference
+        android:icon="@mipmap/ic_launcher"
+        android:key="checkbox"
+        android:summary="This is CheckBox"
+        android:title="CheckBox" />
 
-        <ListPreference
-            android:entries="@array/TestArr"
-            android:entryValues="@array/TestArr"
-            android:key="list"
-            android:negativeButtonText="cancel"
-            android:positiveButtonText="confirm"
-            android:summary="This is ListPreference"
-            android:title="ListPreference"
-            app:noPositiveButton="false" />
+    <!--<PreferenceCategory-->
+        <!--android:key="category"-->
+        <!--android:title="PreferenceCategory 1">-->
 
-        <EditTextPreference
-            android:dialogMessage="Dialog Message"
-            android:hint="INPUT SOMETHING"
-            android:key="editText"
-            android:negativeButtonText="cancel"
-            android:positiveButtonText="confirm"
-            android:summary="This is EditTextPreference"
-            android:title="EditText"
-            app:neutralButtonText="Neutral" />
+        <!--<CheckBoxPreference-->
+            <!--android:icon="@mipmap/ic_launcher"-->
+            <!--android:key="checkbox"-->
+            <!--android:summary="This is CheckBox"-->
+            <!--android:title="CheckBox" />-->
 
-    </PreferenceCategory>
+        <!--<ListPreference-->
+            <!--android:entries="@array/TestArr"-->
+            <!--android:entryValues="@array/TestArr"-->
+            <!--android:key="list"-->
+            <!--android:negativeButtonText="cancel"-->
+            <!--android:positiveButtonText="confirm"-->
+            <!--android:summary="This is ListPreference"-->
+            <!--android:title="ListPreference"-->
+            <!--app:noPositiveButton="false" />-->
 
-    <PreferenceCategory android:title="PreferenceCategory 2">
+        <!--<EditTextPreference-->
+            <!--android:dialogMessage="Dialog Message"-->
+            <!--android:hint="INPUT SOMETHING"-->
+            <!--android:key="editText"-->
+            <!--android:negativeButtonText="cancel"-->
+            <!--android:positiveButtonText="confirm"-->
+            <!--android:summary="This is EditTextPreference"-->
+            <!--android:title="EditText"-->
+            <!--app:neutralButtonText="Neutral" />-->
 
-        <com.poping520.open.xpreference.OptionEditTextPreference
-            android:dialogMessage="Dialog Message"
-            android:hint="INPUT SOMETHING"
-            android:key="optionEditText"
-            android:summary="This is OptionEditTextPreference"
-            android:title="OptionEditTextPreference"
-            app:entries="@array/TestArr"
-            app:entryValues="@array/TestArr"
-            app:randomButtonText="随机" />
+        <!--<com.poping520.open.xpreference.OptionEditTextPreference-->
+            <!--android:dialogMessage="Dialog Message"-->
+            <!--android:hint="INPUT SOMETHING"-->
+            <!--android:key="optionEditText2"-->
+            <!--android:summary="This is OptionEditTextPreference"-->
+            <!--android:title="OptionEditTextPreference"-->
+            <!--app:entries="@array/TestArr"-->
+            <!--app:entryValues="@array/TestArr"-->
+            <!--app:randomButtonText="随机" />-->
 
-    </PreferenceCategory>
+    <!--</PreferenceCategory>-->
+
+    <!--<PreferenceCategory-->
+        <!--android:key="category2"-->
+        <!--android:title="PreferenceCategory 2">-->
+
+        <!--<com.poping520.open.xpreference.OptionEditTextPreference-->
+            <!--android:dialogMessage="Dialog Message"-->
+            <!--android:hint="INPUT SOMETHING"-->
+            <!--android:key="optionEditText"-->
+            <!--android:summary="This is OptionEditTextPreference"-->
+            <!--android:title="OptionEditTextPreference"-->
+            <!--app:entries="@array/TestArr"-->
+            <!--app:entryValues="@array/TestArr"-->
+            <!--app:randomButtonText="随机" />-->
+
+    <!--</PreferenceCategory>-->
 
 </PreferenceScreen>

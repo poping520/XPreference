@@ -23,6 +23,8 @@ import android.view.ViewGroup;
 
 import com.poping520.open.xpreference.PreferenceGroupAdapter.PreferenceViewHolder;
 
+import java.util.Objects;
+
 
 public abstract class PreferenceFragment extends Fragment implements
         PreferenceManager.OnPreferenceTreeClickListener,
@@ -60,11 +62,7 @@ public abstract class PreferenceFragment extends Fragment implements
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        Activity activity = getActivity();
-
-        if (activity == null) {
-            throw new IllegalStateException("the activity object was null");
-        }
+        Activity activity = Objects.requireNonNull(getActivity());
 
         TypedValue tv = new TypedValue();
         activity.getTheme().resolveAttribute(R.attr.preferenceTheme, tv, true);
@@ -172,8 +170,14 @@ public abstract class PreferenceFragment extends Fragment implements
         if (preference.getFragment() != null) {
             boolean handled = false;
             if (getCallbackFragment() instanceof OnPreferenceStartFragmentCallback) {
-
+                handled = ((OnPreferenceStartFragmentCallback) getCallbackFragment())
+                        .onPreferenceStartFragment(this, preference);
             }
+            if (!handled && getActivity() instanceof OnPreferenceStartFragmentCallback) {
+                handled = ((OnPreferenceStartFragmentCallback) getActivity())
+                        .onPreferenceStartFragment(this, preference);
+            }
+            return handled;
         }
         return false;
     }

@@ -32,8 +32,8 @@ public class ListPreference extends DialogPreference {
         mEntryValues = a.getTextArray(R.styleable.ListPreference_android_entryValues);
         mNoPositiveBtn = a.getBoolean(R.styleable.ListPreference_noPositiveButton, false);
         a.recycle();
-        if (super.mSummary != null) {
-            mSummary = super.mSummary.toString();
+        if (getSummary() != null) {
+            mSummary = getSummary().toString();
         }
     }
 
@@ -181,7 +181,7 @@ public class ListPreference extends DialogPreference {
     @Override
     protected Parcelable onSaveInstanceState() {
         final Parcelable superState = super.onSaveInstanceState();
-        if (mPersistent) {
+        if (isPersistent()) {
             return superState;
         }
 

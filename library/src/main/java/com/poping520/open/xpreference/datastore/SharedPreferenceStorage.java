@@ -1,4 +1,4 @@
-package com.poping520.open.xpreference.storage;
+package com.poping520.open.xpreference.datastore;
 
 import android.content.SharedPreferences;
 import android.support.annotation.Nullable;

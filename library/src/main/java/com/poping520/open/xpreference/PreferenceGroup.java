@@ -169,10 +169,12 @@ public abstract class PreferenceGroup extends Preference {
         for (Preference p : mList) {
             if (p == null) continue;
             String curKey = p.getKey();
-            if (curKey != null && TextUtils.equals(curKey, key))
-                return p;
-            if (p instanceof PreferenceGroup)
-                return ((PreferenceGroup) p).findPreference(key);
+            if (TextUtils.equals(curKey, key)) return p;
+
+            if (p instanceof PreferenceGroup) {
+                Preference ret = ((PreferenceGroup) p).findPreference(key);
+                if (ret != null) return ret;
+            }
         }
         return null;
     }
@@ -186,8 +188,9 @@ public abstract class PreferenceGroup extends Preference {
     }
 
     @Override
-    public void onAttached() {
+    protected void onAttached() {
         super.onAttached();
+
         mAttachedToHierarchy = true;
 
         for (Preference p : mList)
@@ -238,10 +241,6 @@ public abstract class PreferenceGroup extends Preference {
         for (int i = 0; i < preferenceCount; i++) {
             getPreference(i).dispatchRestoreInstanceState(container);
         }
-    }
-
-    List<Preference> getPreferenceList() {
-        return mList;
     }
 
     public interface PreferencePositionCallback {

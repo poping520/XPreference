@@ -5,8 +5,8 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.support.annotation.Nullable;
 
-import com.poping520.open.xpreference.storage.SharedPreferenceStorage;
-import com.poping520.open.xpreference.storage.Storage;
+import com.poping520.open.xpreference.datastore.SharedPreferenceStorage;
+import com.poping520.open.xpreference.datastore.Storage;
 
 import java.util.ArrayList;
 import java.util.List;

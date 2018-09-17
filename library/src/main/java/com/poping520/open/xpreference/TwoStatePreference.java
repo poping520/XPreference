@@ -137,8 +137,8 @@ public abstract class TwoStatePreference extends Preference {
             useDefaultSummary = false;
         }
         if (useDefaultSummary) {
-            if (!TextUtils.isEmpty(mSummary)) {
-                tvSummary.setText(mSummary);
+            if (!TextUtils.isEmpty(getSummary())) {
+                tvSummary.setText(getSummary());
                 useDefaultSummary = false;
             }
         }
@@ -154,7 +154,7 @@ public abstract class TwoStatePreference extends Preference {
     @Override
     protected Parcelable onSaveInstanceState() {
         final Parcelable superState = super.onSaveInstanceState();
-        if (mPersistent) {
+        if (isPersistent()) {
             return superState;
         }
 

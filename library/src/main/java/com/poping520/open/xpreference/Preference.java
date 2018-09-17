@@ -1,15 +1,15 @@
 package com.poping520.open.xpreference;
 
 import android.content.Context;
-import android.content.Intent;
 import android.content.res.TypedArray;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.support.annotation.NonNull;
+import android.support.annotation.CallSuper;
 import android.support.annotation.Nullable;
-import android.support.annotation.StringRes;
+import android.support.annotation.RequiresApi;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.accessibility.AccessibilityNodeInfoCompat;
 import android.support.v7.widget.AppCompatImageView;
@@ -21,25 +21,18 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.poping520.open.xpreference.PreferenceGroupAdapter.PreferenceViewHolder;
-import com.poping520.open.xpreference.storage.Storage;
+import com.poping520.open.xpreference.datastore.Storage;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.Set;
 
 public class Preference extends android.preference.Preference {
-
-    private static final String TAG = "Preference";
-
-    public static final int DEFAULT_ORDER = Integer.MAX_VALUE;
 
     protected Context mContext;
     protected PreferenceManager mPreferenceManager;
 
     private Storage mStorage;
-
-    private boolean mDependencyMet = true;
-    private boolean mParentDependencyMet = true;
 
     private boolean mVisible = true;
     private boolean mWasDetached;
@@ -50,83 +43,54 @@ public class Preference extends android.preference.Preference {
     private long mId;
     private boolean mHasId;
 
-    protected int iconResId;
-    protected Drawable icon;
-    protected CharSequence title;
-    protected CharSequence mSummary;
-    protected int mLayoutResId;
-    protected int mWidgetLayoutResId;
-    protected boolean mPersistent;
-    private String mDependencyKey;
-    private String mFragment;
-    private boolean mEnabled;
-    private boolean mSelectable;
-
+    private int mIconResId;
+    private Drawable mIcon;
     private boolean mIconSpaceReserved;
-    private boolean mShouldDisableView;
-
-    private Object defaultValue;
-    private int mOrder;
-
+    private Object mDefaultValue;
     private boolean mHasSingleLineTitleAttr;
-
     private boolean mSingleLineTitle = true;
     private boolean mAllowDividerAbove;
     private boolean mAllowDividerBelow;
 
     private PreferenceGroup mParentGroup;
 
-    private Intent mIntent;
-    private Bundle mExtras;
+    private XPreferenceChangeInternalListener mListener;
 
-    private List<Preference> mDependents;
+    interface XPreferenceChangeInternalListener {
 
-    private OnPreferenceChangeListener mOnChangeListener;
-    private OnPreferenceClickListener mOnClickListener;
-    private OnPreferenceChangeInternalListener mListener;
+        void onPreferenceChange(Preference preference);
 
-    public interface OnPreferenceChangeListener {
-        boolean onPreferenceChange(Preference preference, Object newValue);
+        void onPreferenceHierarchyChange(Preference preference);
+
+        void onPreferenceVisibilityChange(Preference preference);
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     public Preference(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
         this.mContext = context;
 
         final TypedArray a = this.mContext.obtainStyledAttributes(attrs, R.styleable.Preference, defStyleAttr, defStyleRes);
 
-        iconResId = a.getResourceId(R.styleable.Preference_android_icon, 0);
-        title = a.getText(R.styleable.Preference_android_title);
-        mSummary = a.getString(R.styleable.Preference_android_summary);
-        mPersistent = a.getBoolean(R.styleable.Preference_android_persistent, true);
-        mOrder = a.getInt(R.styleable.Preference_android_order, DEFAULT_ORDER);
-        mFragment = a.getString(R.styleable.Preference_android_fragment);
-        mLayoutResId = a.getResourceId(R.styleable.Preference_android_layout, R.layout.xpreference_material);
-        mWidgetLayoutResId = a.getResourceId(R.styleable.Preference_android_widgetLayout, 0);
-        mEnabled = a.getBoolean(R.styleable.Preference_android_enabled, true);
-        mSelectable = a.getBoolean(R.styleable.Preference_android_selectable, true);
-        mDependencyKey = a.getString(R.styleable.Preference_android_dependency);
-
-
+        mIconResId = a.getResourceId(R.styleable.Preference_android_icon, 0);
         if (a.hasValue(R.styleable.Preference_android_defaultValue)) {
-            defaultValue = onGetDefaultValue(a, R.styleable.Preference_android_defaultValue);
+            mDefaultValue = onGetDefaultValue(a, R.styleable.Preference_android_defaultValue);
         }
+
+        mIconSpaceReserved = a.getBoolean(R.styleable.Preference_android_iconSpaceReserved, false);
 
         mHasSingleLineTitleAttr = a.hasValue(R.styleable.Preference_singleLineTitle);
         if (mHasSingleLineTitleAttr) {
             mSingleLineTitle = a.getBoolean(R.styleable.Preference_singleLineTitle, true);
         }
-        mAllowDividerAbove = a.getBoolean(R.styleable.Preference_allowDividerAbove, mSelectable);
-        mAllowDividerBelow = a.getBoolean(R.styleable.Preference_allowDividerBelow, mSelectable);
-
-        mShouldDisableView = a.getBoolean(R.styleable.Preference_android_shouldDisableView, true);
-        mIconSpaceReserved = a.getBoolean(R.styleable.Preference_android_iconSpaceReserved, false);
+        mAllowDividerAbove = a.getBoolean(R.styleable.Preference_allowDividerAbove, isSelectable());
+        mAllowDividerBelow = a.getBoolean(R.styleable.Preference_allowDividerBelow, isSelectable());
 
         a.recycle();
     }
 
     public Preference(Context context, AttributeSet attrs, int defStyleAttr) {
-        this(context, attrs, defStyleAttr, 0);
+        super(context, attrs, defStyleAttr);
     }
 
     public Preference(Context context, AttributeSet attrs) {
@@ -137,115 +101,20 @@ public class Preference extends android.preference.Preference {
         this(context, null);
     }
 
-    public void onInitializeAccessibilityNodeInfo(AccessibilityNodeInfoCompat info) {
-
-    }
-
-    public void onPrepareForRemoval() {
-        super.onPrepareForRemoval();
-        unregisterDependency();
-    }
-
-    private void unregisterDependency() {
-        if (mDependencyKey != null) {
-            Preference old = findPreferenceInHierarchy(mDependencyKey);
-            if (old != null) old.unregisterDependent(this);
-        }
-    }
-
     protected Preference findPreferenceInHierarchy(String key) {
         if (TextUtils.isEmpty(key) || mPreferenceManager == null)
             return null;
         return mPreferenceManager.getPreferenceScreen().findPreference(key);
     }
 
-    private void registerDependent(Preference dependent) {
-        if (mDependents == null) {
-            mDependents = new ArrayList<Preference>();
-        }
-        mDependents.add(dependent);
-        dependent.onDependencyChanged(this, shouldDisableDependents());
-    }
-
-    private void unregisterDependent(Preference dependent) {
-        if (mDependents != null) {
-            mDependents.remove(dependent);
-        }
-    }
-
-    public void notifyDependencyChange(boolean disableDependents) {
-        final List<Preference> dependents = mDependents;
-
-        if (dependents == null) return;
-
-        final int count = dependents.size();
-        for (int i = 0; i < count; i++) {
-            dependents.get(i).onDependencyChanged(this, disableDependents);
-        }
-    }
-
-    public void onDependencyChanged(Preference dependency, boolean disableDependent) {
-        if (mDependencyMet == disableDependent) {
-            mDependencyMet = !disableDependent;
-            notifyDependencyChange(shouldDisableDependents());
-            notifyChanged();
-        }
-    }
-
-    public boolean shouldDisableDependents() {
-        return !isEnabled();
-    }
-
-    public void onParentChanged(PreferenceGroup parent, boolean disableChild) {
-        if (mParentDependencyMet == disableChild) {
-            mParentDependencyMet = !disableChild;
-            notifyDependencyChange(shouldDisableDependents());
-            notifyChanged();
-        }
+    @Override
+    public void onParentChanged(android.preference.Preference parent, boolean disableChild) {
+        super.onParentChanged(parent, disableChild);
     }
 
     public void notifyHierarchyChanged(boolean disableDependents) {
-
-    }
-
-    void dispatchSaveInstanceState(Bundle container) {
-        if (hasKey()) {
-            mBaseMethodCalled = false;
-            Parcelable state = onSaveInstanceState();
-            if (!mBaseMethodCalled) {
-                throw new IllegalStateException("Derived class did not call super.onSaveInstanceState()");
-            }
-            if (state != null) {
-                container.putParcelable(getKey(), state);
-            }
-        }
-    }
-
-    protected Parcelable onSaveInstanceState() {
-        mBaseMethodCalled = true;
-        return BaseSavedState.EMPTY_STATE;
-    }
-
-    public void restoreHierarchyState(Bundle container) {
-        dispatchRestoreInstanceState(container);
-    }
-
-    void dispatchRestoreInstanceState(Bundle bundle) {
-        if (!hasKey()) return;
-        Parcelable state = bundle.getParcelable(getKey());
-        if (state != null) {
-            mBaseMethodCalled = false;
-            onRestoreInstanceState(state);
-            if (!mBaseMethodCalled) {
-                throw new IllegalStateException("Derived class did not call super.onRestoreInstanceState()");
-            }
-        }
-    }
-
-    protected void onRestoreInstanceState(Parcelable state) {
-        mBaseMethodCalled = true;
-        if (state != BaseSavedState.EMPTY_STATE && state != null) {
-            throw new IllegalArgumentException("Wrong state class -- expecting Preference State");
+        if (mListener != null) {
+            mListener.onPreferenceHierarchyChange(this);
         }
     }
 
@@ -254,36 +123,21 @@ public class Preference extends android.preference.Preference {
         return mParentGroup;
     }
 
-    public interface OnPreferenceClickListener {
-
-        boolean onPreferenceClick(Preference preference);
-    }
-
-    interface OnPreferenceChangeInternalListener {
-        /**
-         * Called when this Preference has changed.
-         *
-         * @param preference This preference.
-         */
-        void onPreferenceChange(Preference preference);
-
-        /**
-         * Called when this group has added/removed {@link Preference}(s).
-         *
-         * @param preference This Preference.
-         */
-        void onPreferenceHierarchyChange(Preference preference);
-
-        /**
-         * Called when this preference has changed its visibility.
-         *
-         * @param preference This Preference.
-         */
-        void onPreferenceVisibilityChange(Preference preference);
-    }
 
     void setOnPreferenceChangeInternalListener(PreferenceGroupAdapter listener) {
         mListener = listener;
+    }
+
+    protected void notifyChanged() {
+        if (mListener != null) {
+            mListener.onPreferenceChange(this);
+        }
+    }
+
+    protected void notifyHierarchyChanged() {
+        if (mListener != null) {
+            mListener.onPreferenceHierarchyChange(this);
+        }
     }
 
     /**
@@ -296,13 +150,13 @@ public class Preference extends android.preference.Preference {
     }
 
     public void onBindViewHolder(PreferenceViewHolder holder) {
-        holder.itemView.setOnClickListener(v -> performClick(v));
+        holder.itemView.setOnClickListener(this::performClick);
         holder.itemView.setId(mViewId);
 
         TextView tvTitle = holder.findViewById(R.id.title);
         if (tvTitle != null) {
-            if (!TextUtils.isEmpty(title)) {
-                tvTitle.setText(title);
+            if (!TextUtils.isEmpty(getTitle())) {
+                tvTitle.setText(getTitle());
                 tvTitle.setVisibility(View.VISIBLE);
 
                 if (mHasSingleLineTitleAttr)
@@ -315,8 +169,8 @@ public class Preference extends android.preference.Preference {
 
         TextView tvSummary = holder.findViewById(R.id.summary);
         if (tvSummary != null) {
-            if (!TextUtils.isEmpty(mSummary)) {
-                tvSummary.setText(mSummary);
+            if (!TextUtils.isEmpty(getSummary())) {
+                tvSummary.setText(getSummary());
                 tvSummary.setVisibility(View.VISIBLE);
             } else {
                 tvSummary.setVisibility(View.GONE);
@@ -324,33 +178,37 @@ public class Preference extends android.preference.Preference {
         }
 
         AppCompatImageView ivIcon = holder.findViewById(R.id.icon);
+
         if (ivIcon != null) {
-            if (iconResId != 0 || icon != null) {
-                if (icon == null)
-                    icon = ContextCompat.getDrawable(mContext, iconResId);
-                if (icon != null)
-                    ivIcon.setImageDrawable(icon);
+            if (mIconResId != 0 || mIcon != null) {
+                if (mIcon == null) {
+                    mIcon = ContextCompat.getDrawable(getContext(), mIconResId);
+                }
+                if (mIcon != null) {
+                    ivIcon.setImageDrawable(mIcon);
+                }
             }
-            if (icon != null)
+            if (mIcon != null) {
                 ivIcon.setVisibility(View.VISIBLE);
-            else
+            } else {
                 ivIcon.setVisibility(mIconSpaceReserved ? View.INVISIBLE : View.GONE);
+            }
         }
 
         View imgFrame = holder.findViewById(R.id.icon_frame);
         if (imgFrame != null) {
-            if (icon != null)
+            if (getIcon() != null)
                 imgFrame.setVisibility(View.VISIBLE);
             else
                 imgFrame.setVisibility(mIconSpaceReserved ? View.INVISIBLE : View.GONE);
         }
-        if (mShouldDisableView)
+        if (getShouldDisableView())
             setEnabledStateOnViews(holder.itemView, isEnabled());
         else
             setEnabledStateOnViews(holder.itemView, true);
 
-        holder.itemView.setFocusable(mSelectable);
-        holder.itemView.setClickable(mSelectable);
+        holder.itemView.setFocusable(isSelectable());
+        holder.itemView.setClickable(isSelectable());
 
         holder.setDividerAllowedAbove(mAllowDividerAbove);
         holder.setDividerAllowedBelow(mAllowDividerBelow);
@@ -367,18 +225,17 @@ public class Preference extends android.preference.Preference {
         }
     }
 
-
     void assignParent(@Nullable PreferenceGroup parentGroup) {
         mParentGroup = parentGroup;
     }
 
-    public void onAttached() {
-        registerDependency();
+    @Override
+    protected void onPrepareForRemoval() {
+        super.onPrepareForRemoval();
     }
 
-    private void registerDependency() {
-        if (TextUtils.isEmpty(mDependencyKey)) return;
-
+    protected void onAttached() {
+        super.onAttachedToActivity();
     }
 
     public void onAttachedToHierarchy(PreferenceManager preferenceManager) {
@@ -399,23 +256,31 @@ public class Preference extends android.preference.Preference {
 
     private void dispatchSetInitialValue() {
         if (!shouldPersist() || !mStorage.contains(getKey())) {
-            if (defaultValue != null) {
-                onSetInitialValue(false, defaultValue);
+            if (mDefaultValue != null) {
+                onSetInitialValue(false, mDefaultValue);
             }
         } else {
             onSetInitialValue(true, null);
         }
     }
 
-    protected void onSetInitialValue(boolean restorePersistedValue, Object defaultValue) {
-    }
-
-    protected void notifyHierarchyChanged() {
-        if (mListener != null) mListener.onPreferenceHierarchyChange(this);
-    }
-
     public void onDetached() {
+        try {
+            Method method = getClass().getDeclaredMethod("unregisterDependency");
+            method.setAccessible(true);
+            method.invoke(this);
+            mWasDetached = true;
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        }
+    }
 
+    public final boolean wasDetached() {
+        return mWasDetached;
     }
 
     void clearWasDetached() {
@@ -429,7 +294,8 @@ public class Preference extends android.preference.Preference {
 
         onClick();
 
-        if (mOnClickListener != null && mOnClickListener.onPreferenceClick(this)) {
+        OnPreferenceClickListener clickListener = getOnPreferenceClickListener();
+        if (clickListener != null && clickListener.onPreferenceClick(this)) {
             return;
         }
 
@@ -441,28 +307,13 @@ public class Preference extends android.preference.Preference {
             }
         }
 
-        if (mIntent != null) {
-            mContext.startActivity(mIntent);
+        if (getIntent() != null) {
+            mContext.startActivity(getIntent());
         }
     }
 
-    protected void onClick() {
-    }
-
-    public boolean callChangeListener(Object newValue) {
-        return mOnChangeListener == null || mOnChangeListener.onPreferenceChange(this, newValue);
-    }
-
-    public void setPersistent(boolean persistent) {
-        mPersistent = persistent;
-    }
-
-    public boolean isPersistent() {
-        return mPersistent;
-    }
-
     protected boolean shouldPersist() {
-        return mPersistent && hasKey();
+        return isPersistent() && hasKey();
     }
 
     protected boolean persistInt(int value) {
@@ -525,96 +376,28 @@ public class Preference extends android.preference.Preference {
         return mStorage.getStringSet(getKey(), defaultValue);
     }
 
-    public void setIntent(Intent intent) {
-        mIntent = intent;
-    }
-
-    public Intent getIntent() {
-        return mIntent;
-    }
-
-    public void setFragment(String fragment) {
-        mFragment = fragment;
-    }
-
-    public String getFragment() {
-        return mFragment;
-    }
-
-    public Bundle getExtras() {
-        if (mExtras == null)
-            mExtras = new Bundle();
-        return mExtras;
-    }
-
-    public Bundle peekExtras() {
-        return mExtras;
-    }
-
-    public void setLayoutResId(int layoutResId) {
-        this.mLayoutResId = layoutResId;
-    }
-
-    public int getLayoutResource() {
-        return mLayoutResId;
-    }
-
-    public void setWidgetLayoutResource(int widgetLayoutResId) {
-        mWidgetLayoutResId = widgetLayoutResId;
-    }
-
-    public int getWidgetLayoutResource() {
-        return mWidgetLayoutResId;
-    }
-
-    public void setOrder(int order) {
-        if (order != mOrder) {
-            mOrder = order;
-
-            // Reorder list
-            notifyHierarchyChanged();
-        }
-    }
-
-    public int getOrder() {
-        return mOrder;
-    }
-
     public void setViewId(int viewId) {
         mViewId = viewId;
     }
 
-    public void setTitle(CharSequence title) {
-        if ((title == null && this.title != null) || (title != null && !title.equals(this.title))) {
-            this.title = title;
+    public void setIcon(Drawable icon) {
+        if ((icon == null && mIcon != null) || (icon != null && mIcon != icon)) {
+            mIcon = icon;
+            mIconResId = 0;
             notifyChanged();
         }
     }
 
-    public void setTitle(@StringRes int resId) {
-        setTitle(mContext.getString(resId));
+    public void setIcon(int iconResId) {
+        setIcon(ContextCompat.getDrawable(mContext, iconResId));
+        mIconResId = iconResId;
     }
 
-    public CharSequence getTitle() {
-        return title;
-    }
-
-    public void setSummary(CharSequence summary) {
-        if ((summary == null && mSummary != null)
-                || (summary != null && !summary.equals(mSummary))) {
-            mSummary = summary;
-            notifyChanged();
+    public Drawable getIcon() {
+        if (mIcon == null && mIconResId != 0) {
+            mIcon = ContextCompat.getDrawable(mContext, mIconResId);
         }
-    }
-
-    public CharSequence getSummary() {
-        return mSummary;
-    }
-
-    protected void notifyChanged() {
-        if (mListener != null) {
-            mListener.onPreferenceChange(this);
-        }
+        return mIcon;
     }
 
     public PreferenceManager getXPreferenceManager() {
@@ -638,36 +421,54 @@ public class Preference extends android.preference.Preference {
         return mVisible;
     }
 
-    public void setEnabled(boolean enabled) {
-        if (mEnabled != enabled) {
-            mEnabled = enabled;
-            notifyDependencyChange(shouldDisableDependents());
-            notifyChanged();
+    public void saveHierarchyState(Bundle container) {
+        dispatchSaveInstanceState(container);
+    }
+
+    void dispatchSaveInstanceState(Bundle container) {
+        if (hasKey()) {
+            mBaseMethodCalled = false;
+            Parcelable state = onSaveInstanceState();
+            if (!mBaseMethodCalled) {
+                throw new IllegalStateException("Derived class did not call super.onSaveInstanceState()");
+            }
+            if (state != null) {
+                container.putParcelable(getKey(), state);
+            }
         }
     }
 
-    public boolean isEnabled() {
-        return mEnabled && mDependencyMet && mParentDependencyMet;
+    protected Parcelable onSaveInstanceState() {
+        mBaseMethodCalled = true;
+        return BaseSavedState.EMPTY_STATE;
     }
 
-    public void setSelectable(boolean selectable) {
-        if (mSelectable != selectable) {
-            mSelectable = selectable;
-            notifyChanged();
+    public void restoreHierarchyState(Bundle container) {
+        dispatchRestoreInstanceState(container);
+    }
+
+    void dispatchRestoreInstanceState(Bundle bundle) {
+        if (!hasKey()) return;
+        Parcelable state = bundle.getParcelable(getKey());
+        if (state != null) {
+            mBaseMethodCalled = false;
+            onRestoreInstanceState(state);
+            if (!mBaseMethodCalled) {
+                throw new IllegalStateException("Derived class did not call super.onRestoreInstanceState()");
+            }
         }
     }
 
-    public boolean isSelectable() {
-        return mSelectable;
+    protected void onRestoreInstanceState(Parcelable state) {
+        mBaseMethodCalled = true;
+        if (state != BaseSavedState.EMPTY_STATE && state != null) {
+            throw new IllegalArgumentException("Wrong state class -- expecting Preference State");
+        }
     }
 
-    public void setShouldDisableView(boolean shouldDisableView) {
-        mShouldDisableView = shouldDisableView;
-        notifyChanged();
-    }
+    @CallSuper
+    public void onInitializeAccessibilityNodeInfo(AccessibilityNodeInfoCompat info) {
 
-    public boolean isShouldDisableView() {
-        return mShouldDisableView;
     }
 
     public static class BaseSavedState extends AbsSavedState {
